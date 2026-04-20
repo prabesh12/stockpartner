@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useSearchParams, useNavigate, Link } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
 import { Lock, Loader2, CheckCircle, ArrowRight } from 'lucide-react';
 import authService from '@/services/auth.service';
 import toast from 'react-hot-toast';
@@ -9,7 +9,6 @@ import { ResetPasswordRequest } from 'shared';
 export const ResetPassword = () => {
   const { register, handleSubmit, watch, formState: { errors } } = useForm<any>();
   const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
   const token = searchParams.get('token');
   
   const [isLoading, setIsLoading] = useState(false);
@@ -43,9 +42,12 @@ export const ResetPassword = () => {
         <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 text-center border border-gray-100">
            <h2 className="text-2xl font-bold text-gray-900 mb-4">Invalid Reset Link</h2>
            <p className="text-gray-500 mb-8">This link is invalid or expired. Please request a new one.</p>
-           <Link to="/forgot-password" size="lg" className="inline-block w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl transition-all">
+            <Link 
+              to="/forgot-password"
+              className="inline-block w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl transition-all"
+            >
               Request New Link
-           </Link>
+            </Link>
         </div>
       </div>
     );

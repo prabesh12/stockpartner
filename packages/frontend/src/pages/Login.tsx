@@ -61,7 +61,7 @@ export const Login = () => {
                 placeholder="••••••••"
               />
               <div className="flex justify-end mt-1">
-                <Link to="/forgot-password" size="sm" className="text-xs font-medium text-blue-600 hover:text-blue-500">
+                <Link to="/forgot-password" title="Reset Password" className="text-xs font-medium text-blue-600 hover:text-blue-500">
                   Forgot Password?
                 </Link>
               </div>

@@ -85,8 +85,8 @@ const authSlice = createSlice({
       .addCase(loginUser.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isAuthenticated = true;
-        state.user = action.payload.user;
-        state.token = action.payload.token;
+        state.user = (action.payload.user as AuthUser) || null;
+        state.token = action.payload.token || null;
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.isLoading = false;
@@ -100,8 +100,8 @@ const authSlice = createSlice({
         state.isLoading = false;
         if (action.payload.token) {
           state.isAuthenticated = true;
-          state.user = action.payload.user;
-          state.token = action.payload.token;
+          state.user = (action.payload.user as AuthUser) || null;
+          state.token = action.payload.token || null;
         }
       })
       .addCase(registerUser.rejected, (state, action) => {
