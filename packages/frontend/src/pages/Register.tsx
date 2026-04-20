@@ -44,7 +44,8 @@ export const Register = () => {
       await dispatch(registerUser(payload)).unwrap();
       toast.success("Shop registered successfully!");
     } catch (err: any) {
-      toast.error(err.message || "Failed to register shop");
+      const msg = typeof err === 'string' ? err : (err.message || "Failed to register shop");
+      toast.error(msg);
     }
   };
 

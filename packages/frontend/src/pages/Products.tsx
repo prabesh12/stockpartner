@@ -40,7 +40,8 @@ export const Products = () => {
       }
       handleCloseModal();
     } catch (err: any) {
-      toast.error(err.message || 'Failed to save product');
+      const msg = typeof err === 'string' ? err : (err.message || 'Failed to save product');
+      toast.error(msg);
     }
   };
 
@@ -50,7 +51,8 @@ export const Products = () => {
         await dispatch(removeProduct(id)).unwrap();
         toast.success('Product deleted');
       } catch (err: any) {
-        toast.error(err.message || 'Failed to delete product');
+        const msg = typeof err === 'string' ? err : (err.message || 'Failed to delete product');
+        toast.error(msg);
       }
     }
   };

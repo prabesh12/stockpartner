@@ -47,7 +47,8 @@ export const Customers = () => {
       }
       setIsCustomerModalOpen(false);
     } catch (err: any) {
-      toast.error(err.message || "Failed to save customer");
+      const msg = typeof err === 'string' ? err : (err.message || "Failed to save customer");
+      toast.error(msg);
     }
   };
 
@@ -59,7 +60,8 @@ export const Customers = () => {
         setIsPaymentModalOpen(false);
       }
     } catch (err: any) {
-      toast.error(err.message || "Failed to record payment");
+      const msg = typeof err === 'string' ? err : (err.message || "Failed to record payment");
+      toast.error(msg);
     }
   };
 

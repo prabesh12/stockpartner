@@ -29,7 +29,8 @@ export const Login = () => {
       await dispatch(loginUser(data)).unwrap();
       toast.success("Welcome back!");
     } catch (err: any) {
-      toast.error(err.message || "Failed to sign in");
+      const msg = typeof err === 'string' ? err : (err.message || "Failed to sign in");
+      toast.error(msg);
     }
   };
 
