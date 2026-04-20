@@ -15,6 +15,9 @@ import { Dashboard } from '@/pages/Dashboard';
 import { SuperAdminDashboard } from '@/pages/SuperAdminDashboard';
 import { WorkspaceDetail } from '@/pages/WorkspaceDetail';
 import { POS } from '@/pages/POS';
+import { VerifyEmail } from '@/pages/VerifyEmail';
+import { ForgotPassword } from '@/pages/ForgotPassword';
+import { ResetPassword } from '@/pages/ResetPassword';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 
 function App() {
@@ -27,6 +30,7 @@ function App() {
       dispatch(getMe());
     }
   }, [token, user, dispatch]);
+
   useEffect(() => {
     const handleOnline = () => {
       if (token) {
@@ -50,6 +54,9 @@ function App() {
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/verify-email" element={<VerifyEmail />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
       
       {/* Protected Routes */}
       <Route element={<ProtectedRoute />}>

@@ -24,7 +24,7 @@ export const loginUser = createAsyncThunk(
     try {
       return await authService.login(data);
     } catch (error: any) {
-      return thunkAPI.rejectWithValue(error.error || 'Login failed');
+      return thunkAPI.rejectWithValue(error.message || 'Login failed');
     }
   }
 );
@@ -35,7 +35,7 @@ export const registerUser = createAsyncThunk(
     try {
       return await authService.register(data);
     } catch (error: any) {
-      return thunkAPI.rejectWithValue(error.error || 'Registration failed');
+      return thunkAPI.rejectWithValue(error.message || 'Registration failed');
     }
   }
 );
@@ -46,7 +46,7 @@ export const getMe = createAsyncThunk(
     try {
       return await authService.getMe();
     } catch (error: any) {
-      return thunkAPI.rejectWithValue('Session expired');
+      return thunkAPI.rejectWithValue(error.message || 'Session expired');
     }
   }
 );
@@ -57,7 +57,7 @@ export const addShopCategory = createAsyncThunk(
     try {
       return await authService.addCategory(category);
     } catch (error: any) {
-      return thunkAPI.rejectWithValue(error.error || 'Failed to add category');
+      return thunkAPI.rejectWithValue(error.message || 'Failed to add category');
     }
   }
 );
@@ -98,9 +98,11 @@ const authSlice = createSlice({
       })
       .addCase(registerUser.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.isAuthenticated = true;
-        state.user = action.payload.user;
-        state.token = action.payload.token;
+        if (action.payload.token) {
+          state.isAuthenticated = true;
+          state.user = action.payload.user;
+          state.token = action.payload.token;
+        }
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.isLoading = false;

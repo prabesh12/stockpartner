@@ -60,6 +60,11 @@ export const Login = () => {
                 className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm mt-1"
                 placeholder="••••••••"
               />
+              <div className="flex justify-end mt-1">
+                <Link to="/forgot-password" size="sm" className="text-xs font-medium text-blue-600 hover:text-blue-500">
+                  Forgot Password?
+                </Link>
+              </div>
               {errors.password && <span className="text-sm text-red-500">{errors.password.message}</span>}
             </div>
           </div>

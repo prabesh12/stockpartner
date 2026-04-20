@@ -14,11 +14,13 @@ export interface AuthUser {
   phone: string | null;
   role: UserRole;
   shopCategories?: string[];
+  isVerified: boolean;
 }
 
 export interface AuthResponse {
-  token: string;
-  user: AuthUser;
+  token?: string;
+  user?: AuthUser;
+  message?: string;
 }
 
 export interface LoginRequest {
@@ -34,6 +36,15 @@ export interface RegisterRequest {
   phone?: string;
   password?: string;
   categories?: string[];
+}
+
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+export interface ResetPasswordRequest {
+  token: string;
+  newPassword: string;
 }
 
 export interface CreateProductRequest {

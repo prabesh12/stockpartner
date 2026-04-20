@@ -60,6 +60,10 @@ model User {
   phone        String?  @db.VarChar(20)
   passwordHash String   @map("password_hash") @db.VarChar(255)
   role         UserRole @default(STAFF)
+  isVerified   Boolean  @default(false) @map("is_verified")
+  verificationToken String? @unique @map("verification_token") @db.VarChar(255)
+  resetToken        String? @unique @map("reset_token") @db.VarChar(255)
+  resetTokenExpires DateTime? @map("reset_token_expires")
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
 

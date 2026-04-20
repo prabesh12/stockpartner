@@ -54,7 +54,7 @@ export const POS = () => {
        dispatch(fetchProducts());
        setOfflineCount(await getPendingSalesCount());
     } else {
-       toast.error("Failed to process sale");
+       toast.error(error || "Failed to process sale");
     }
   };
 

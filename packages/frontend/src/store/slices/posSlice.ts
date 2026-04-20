@@ -84,7 +84,7 @@ export const submitSale = createAsyncThunk(
         await enqueueSale(payload);
         return { offline: true, message: 'Network failed. Saved to Offline Queue' };
       }
-      return rejectWithValue(err.error || 'Checkout failed internally');
+      return rejectWithValue(err.message || 'Checkout failed internally');
     }
   }
 );
