@@ -1,4 +1,3 @@
-import React from 'react';
 import { AlertTriangle, RefreshCcw } from 'lucide-react';
 
 export const GlobalErrorFallback = ({ error, resetErrorBoundary }: any) => {
@@ -13,7 +12,7 @@ export const GlobalErrorFallback = ({ error, resetErrorBoundary }: any) => {
           An unexpected error occurred in the application. Our team has been notified.
         </p>
         
-        {process.env.NODE_ENV !== 'production' && (
+        {import.meta.env.DEV && (
           <div className="bg-red-50 text-red-900 p-4 rounded-lg text-left overflow-auto text-xs w-full mb-6 font-mono border border-red-200">
              {error?.message}
           </div>

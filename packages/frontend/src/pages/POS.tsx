@@ -12,7 +12,7 @@ import {
   clearCart, 
   submitSale 
 } from '@/store/slices/posSlice';
-import { ShoppingCart, Plus, Minus, X, Banknote, UserRound, ArrowRight, WifiOff, RefreshCw } from 'lucide-react';
+import { ShoppingCart, Plus, Minus, X, Banknote, UserRound, ArrowRight, WifiOff } from 'lucide-react';
 import { ProductDTO, CustomerDTO } from 'shared';
 import { getPendingSalesCount } from '@/utils/offlineQueue';
 import toast from 'react-hot-toast';

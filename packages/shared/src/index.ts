@@ -8,6 +8,7 @@ export type UserRole = 'OWNER' | 'STAFF' | 'PLATFORM_ADMIN';
 export interface AuthUser {
   id: string;
   shopId: string;
+  shopName?: string;
   name: string;
   email: string | null;
   phone: string | null;
