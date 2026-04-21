@@ -6,7 +6,6 @@ import authService from '@/services/auth.service';
 export const VerifyEmail = () => {
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
-  
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [message, setMessage] = useState('');
 
@@ -16,7 +15,6 @@ export const VerifyEmail = () => {
       setMessage('No verification token found. Please check your email link.');
       return;
     }
-
     const verify = async () => {
       try {
         const res = await authService.verifyEmail(token);
@@ -27,53 +25,49 @@ export const VerifyEmail = () => {
         setMessage(typeof err === 'string' ? err : (err.message || 'Verification failed'));
       }
     };
-
     verify();
   }, [token]);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 text-center border border-gray-100">
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+      <div className="max-w-md w-full bg-white rounded-2xl border border-slate-200 shadow-sm p-8 text-center">
         {status === 'loading' && (
-          <div className="flex flex-col items-center">
-            <Loader2 className="w-16 h-16 text-blue-600 animate-spin mb-4" />
-            <h2 className="text-2xl font-bold text-gray-900">Verifying Email...</h2>
-            <p className="text-gray-500 mt-2">Please wait while we confirm your account.</p>
+          <div className="flex flex-col items-center gap-4">
+            <Loader2 className="w-14 h-14 text-emerald-600 animate-spin" />
+            <h2 className="text-xl font-bold text-slate-800">Verifying Email...</h2>
+            <p className="text-slate-500 text-sm">Please wait while we confirm your account.</p>
           </div>
         )}
 
         {status === 'success' && (
-          <div className="flex flex-col items-center">
-            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6">
-              <CheckCircle className="w-12 h-12 text-green-600" />
+          <div className="flex flex-col items-center gap-4">
+            <div className="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center mb-2">
+              <CheckCircle className="w-11 h-11 text-emerald-600" />
             </div>
-            <h2 className="text-2xl font-bold text-gray-900">Email Verified!</h2>
-            <p className="text-gray-600 mt-3 mb-8">{message}</p>
-            <Link 
+            <h2 className="text-xl font-bold text-slate-800">Email Verified!</h2>
+            <p className="text-slate-500 text-sm">{message}</p>
+            <Link
               to="/login"
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl transition-all shadow-lg hover:shadow-blue-200"
+              className="w-full mt-4 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 px-6 rounded-xl transition-colors shadow-sm"
             >
-              Back to Login
+              Continue to Login
             </Link>
           </div>
         )}
 
         {status === 'error' && (
-          <div className="flex flex-col items-center">
-            <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mb-6">
-              <XCircle className="w-12 h-12 text-red-600" />
+          <div className="flex flex-col items-center gap-4">
+            <div className="w-20 h-20 bg-rose-50 rounded-full flex items-center justify-center mb-2">
+              <XCircle className="w-11 h-11 text-rose-500" />
             </div>
-            <h2 className="text-2xl font-bold text-gray-900">Verification Failed</h2>
-            <p className="text-red-500 mt-3 mb-8">{message}</p>
-            <div className="flex flex-col gap-3 w-full">
-              <Link 
-                to="/register"
-                className="w-full bg-gray-900 hover:bg-black text-white font-bold py-3 px-6 rounded-xl transition-all shadow-lg"
-              >
+            <h2 className="text-xl font-bold text-slate-800">Verification Failed</h2>
+            <p className="text-rose-500 text-sm">{message}</p>
+            <div className="flex flex-col gap-2.5 w-full mt-4">
+              <Link to="/register" className="w-full bg-slate-800 hover:bg-slate-900 text-white font-semibold py-3 px-6 rounded-xl transition-colors">
                 Try Registering Again
               </Link>
-              <Link to="/login" className="text-blue-600 font-medium hover:underline">
-                Go back to Login
+              <Link to="/login" className="text-emerald-600 font-semibold text-sm hover:text-emerald-700 transition-colors">
+                Back to Login
               </Link>
             </div>
           </div>

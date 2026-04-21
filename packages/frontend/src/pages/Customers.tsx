@@ -6,22 +6,20 @@ import { fetchCustomers, addCustomer, editCustomer, processPayment, clearCustome
 import { CustomerDTO } from 'shared';
 import { CustomerForm } from '@/components/CustomerForm';
 import { PaymentForm } from '@/components/PaymentForm';
-import { Users, Edit2, Wallet, FileText } from 'lucide-react';
+import { Users, Edit2, Wallet, FileText, Plus } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export const Customers = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const { items, isLoading, error } = useSelector((state: RootState) => state.customers);
-  
+
   const [isCustomerModalOpen, setIsCustomerModalOpen] = useState(false);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [activeCustomer, setActiveCustomer] = useState<CustomerDTO | null>(null);
   const [isEditMode, setIsEditMode] = useState(false);
 
-  useEffect(() => {
-    dispatch(fetchCustomers());
-  }, [dispatch]);
+  useEffect(() => { dispatch(fetchCustomers()); }, [dispatch]);
 
   const handleOpenCustomerModal = (customer?: CustomerDTO) => {
     setActiveCustomer(customer || null);
@@ -47,8 +45,7 @@ export const Customers = () => {
       }
       setIsCustomerModalOpen(false);
     } catch (err: any) {
-      const msg = typeof err === 'string' ? err : (err.message || "Failed to save customer");
-      toast.error(msg);
+      toast.error(typeof err === 'string' ? err : (err.message || "Failed to save customer"));
     }
   };
 
@@ -60,101 +57,104 @@ export const Customers = () => {
         setIsPaymentModalOpen(false);
       }
     } catch (err: any) {
-      const msg = typeof err === 'string' ? err : (err.message || "Failed to record payment");
-      toast.error(msg);
+      toast.error(typeof err === 'string' ? err : (err.message || "Failed to record payment"));
     }
   };
 
-  const calculateTotalUdhar = () => items.reduce((acc, c) => acc + Number(c.totalDue), 0);
+  const totalCredit = items.reduce((acc, c) => acc + Number(c.totalDue), 0);
 
   return (
-    <div className="p-4 md:p-8 max-w-7xl mx-auto w-full">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-        <div className="flex items-center gap-4">
-          <div className="p-3 bg-indigo-100 text-indigo-600 rounded-xl">
-            <Users size={28} />
+    <div className="p-4 md:p-6 max-w-7xl mx-auto w-full space-y-5">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-5 rounded-2xl border border-slate-200">
+        <div className="flex items-center gap-3.5">
+          <div className="p-2.5 bg-emerald-50 text-emerald-600 rounded-xl">
+            <Users size={24} />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Customers & Udhar</h1>
-            <p className="text-gray-500 text-sm">Manage contacts and track credit payments.</p>
+            <h1 className="text-xl font-bold text-slate-800">Customers & Credit</h1>
+            <p className="text-slate-500 text-sm">Manage contacts and track credit payments.</p>
           </div>
         </div>
-        
-        <div className="flex flex-col md:flex-row items-start md:items-center gap-4 md:gap-6 w-full md:w-auto">
-          <div className="text-left md:text-right w-full md:w-auto">
-             <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Total Market Due</p>
-             <p className="text-xl font-bold text-red-600">₹{calculateTotalUdhar().toFixed(2)}</p>
+
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full md:w-auto">
+          <div className="bg-rose-50 border border-rose-100 rounded-xl px-4 py-2.5 w-full sm:w-auto text-center sm:text-right">
+            <p className="text-xs font-semibold text-rose-400 uppercase tracking-wider">Total Market Due</p>
+            <p className="text-lg font-bold text-rose-600">₹{totalCredit.toFixed(2)}</p>
           </div>
-          <button 
+          <button
             onClick={() => handleOpenCustomerModal()}
-            className="w-full md:w-auto flex justify-center items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg font-medium transition-all shadow-sm"
+            className="w-full sm:w-auto flex justify-center items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition-colors shadow-sm"
           >
-            <Users size={18} /> Add Customer
+            <Plus size={18} />Add Customer
           </button>
         </div>
       </div>
 
-      {error && <div className="mb-6 p-4 bg-red-50 text-red-600 rounded-xl border border-red-100 font-medium">{error}</div>}
+      {error && <div className="p-4 bg-rose-50 text-rose-600 rounded-xl border border-rose-100 text-sm font-medium">{error}</div>}
 
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      {/* Table */}
+      <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
         {isLoading && items.length === 0 ? (
-          <div className="p-12 text-center text-gray-500">Loading customers...</div>
+          <div className="p-12 text-center">
+            <div className="w-8 h-8 border-[3px] border-emerald-600 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+            <p className="text-slate-500 text-sm">Loading customers...</p>
+          </div>
         ) : items.length === 0 ? (
           <div className="p-16 text-center">
-             <div className="mx-auto w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4 text-gray-400">
-                <Users size={32} />
-             </div>
-             <h3 className="text-lg font-bold text-gray-900 mb-1">No customers yet</h3>
-             <p className="text-gray-500 mb-6">Build your network to start tracking credit sales.</p>
-             <button onClick={() => handleOpenCustomerModal()} className="text-indigo-600 font-semibold">
-                + Add Customer
-             </button>
+            <div className="mx-auto w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mb-4 text-slate-300">
+              <Users size={30} strokeWidth={1.5} />
+            </div>
+            <h3 className="text-base font-bold text-slate-800 mb-1.5">No customers yet</h3>
+            <p className="text-slate-500 text-sm mb-5">Build your network to start tracking credit sales.</p>
+            <button onClick={() => handleOpenCustomerModal()} className="text-emerald-600 font-semibold text-sm hover:text-emerald-700 transition-colors">
+              + Add Customer
+            </button>
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+            <table className="w-full text-left">
               <thead>
-                <tr className="bg-gray-50 border-b border-gray-100">
-                  <th className="px-6 py-4 text-sm font-semibold text-gray-600 uppercase tracking-wider">Customer Details</th>
-                  <th className="px-6 py-4 text-sm font-semibold text-gray-600 uppercase tracking-wider">Contact</th>
-                  <th className="px-6 py-4 text-sm font-semibold text-gray-600 uppercase tracking-wider text-right">Udhar Balance</th>
-                  <th className="px-6 py-4 text-sm font-semibold text-gray-600 uppercase tracking-wider text-right">Actions</th>
+                <tr className="bg-slate-50 border-b border-slate-100">
+                  <th className="px-5 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">Customer</th>
+                  <th className="px-5 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">Contact</th>
+                  <th className="px-5 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider text-right">Credit Balance</th>
+                  <th className="px-5 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-50">
+              <tbody className="divide-y divide-slate-50">
                 {items.map((customer) => (
-                  <tr key={customer.id} className="hover:bg-gray-50/50 transition-colors">
-                    <td className="px-6 py-4">
-                      <div className="font-semibold text-gray-900">{customer.name}</div>
-                      <div className="text-xs text-gray-500 mt-1 truncate max-w-[200px]">{customer.address || 'No address'}</div>
+                  <tr key={customer.id} className="hover:bg-slate-50/60 transition-colors">
+                    <td className="px-5 py-4">
+                      <div className="font-semibold text-slate-800 text-sm">{customer.name}</div>
+                      <div className="text-xs text-slate-400 mt-0.5 truncate max-w-[200px]">{customer.address || 'No address'}</div>
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="text-gray-900 font-medium flex items-center gap-1">{customer.phone}</div>
+                    <td className="px-5 py-4">
+                      <div className="text-slate-600 text-sm font-medium">{customer.phone}</div>
                     </td>
-                    <td className="px-6 py-4 text-right">
-                      <span className={`font-bold ${Number(customer.totalDue) > 0 ? 'text-red-500' : 'text-green-600'}`}>
+                    <td className="px-5 py-4 text-right">
+                      <span className={`text-sm font-bold ${Number(customer.totalDue) > 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
                         ₹{Number(customer.totalDue).toFixed(2)}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-right">
-                      <div className="flex items-center justify-end gap-2">
+                    <td className="px-5 py-4 text-right">
+                      <div className="flex items-center justify-end gap-1.5 flex-wrap">
                         {Number(customer.totalDue) > 0 && (
-                          <button 
-                            onClick={() => handleOpenPaymentModal(customer)} 
-                            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-green-700 bg-green-100 hover:bg-green-200 rounded-lg transition-colors border border-green-200"
+                          <button
+                            onClick={() => handleOpenPaymentModal(customer)}
+                            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg transition-colors border border-emerald-200"
                           >
-                            <Wallet size={14} /> Receive Pay
+                            <Wallet size={13} />Receive Pay
                           </button>
                         )}
-                        <button 
-                          onClick={() => navigate(`/dashboard/customers/${customer.id}/ledger`)} 
-                          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-blue-700 bg-blue-100 hover:bg-blue-200 rounded-lg transition-colors border border-blue-200"
-                          title="View Passbook"
+                        <button
+                          onClick={() => navigate(`/dashboard/customers/${customer.id}/ledger`)}
+                          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors"
                         >
-                          <FileText size={14} /> Ledger
+                          <FileText size={13} />Ledger
                         </button>
-                        <button onClick={() => handleOpenCustomerModal(customer)} className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors">
-                          <Edit2 size={18} />
+                        <button onClick={() => handleOpenCustomerModal(customer)} className="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors">
+                          <Edit2 size={15} />
                         </button>
                       </div>
                     </td>
@@ -167,20 +167,20 @@ export const Customers = () => {
       </div>
 
       {isCustomerModalOpen && (
-        <CustomerForm 
-          initialData={activeCustomer} 
-          onSubmit={handleCustomerSubmit} 
+        <CustomerForm
+          initialData={activeCustomer}
+          onSubmit={handleCustomerSubmit}
           onClose={() => setIsCustomerModalOpen(false)}
-          isLoading={isLoading} 
+          isLoading={isLoading}
         />
       )}
 
       {isPaymentModalOpen && activeCustomer && (
-        <PaymentForm 
-          customer={activeCustomer} 
-          onSubmit={handlePaymentSubmit} 
+        <PaymentForm
+          customer={activeCustomer}
+          onSubmit={handlePaymentSubmit}
           onClose={() => setIsPaymentModalOpen(false)}
-          isLoading={isLoading} 
+          isLoading={isLoading}
         />
       )}
     </div>

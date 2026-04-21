@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ShoppingCart, Star, Heart, Image as ImageIcon } from 'lucide-react';
+import { ShoppingCart, Heart, Image as ImageIcon, Store } from 'lucide-react';
 
 interface ProductCardProps {
   id: string;
@@ -24,8 +24,8 @@ export function ProductCard({
   name,
   price,
   originalPrice,
-  rating = 0,
-  reviews = 0,
+  rating: _rating = 0,
+  reviews: _reviews = 0,
   store,
   quantity,
   onClick,
@@ -33,7 +33,6 @@ export function ProductCard({
   const [isAdded, setIsAdded] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
 
-  // Calculate discount if originalPrice exists
   const discountPercent = originalPrice && originalPrice > price
     ? Math.round(((originalPrice - price) / originalPrice) * 100)
     : 0;
@@ -51,37 +50,32 @@ export function ProductCard({
 
   return (
     <div className="group relative h-full cursor-pointer" onClick={onClick}>
-      {/* Card Container */}
-      <div className="flex h-full flex-col rounded-2xl border border-gray-100 bg-white transition-all duration-500 ease-out hover:border-orange-200 hover:shadow-[0_20px_50px_rgba(255,115,0,0.15)] shadow-xl shadow-gray-200/50 overflow-hidden hover:-translate-y-2">
+      <div className="flex h-full flex-col rounded-2xl border border-slate-200 bg-white transition-all duration-300 hover:border-slate-300 hover:shadow-lg overflow-hidden">
         {/* Image Section */}
-        <div className="relative h-48 sm:h-56 w-full overflow-hidden bg-gray-50">
-          {/* Status Badges */}
+        <div className="relative h-48 w-full overflow-hidden bg-slate-50">
+          {/* Badges */}
           <div className="absolute inset-x-3 top-3 z-10 flex justify-between items-start pointer-events-none">
             {badge && (
-              <div className="flex items-center gap-1.5 rounded-full bg-orange-500 px-3 py-1.5 text-[9px] font-black uppercase text-white shadow-lg shadow-orange-500/30">
-                <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></span>
+              <div className="flex items-center gap-1.5 rounded-md bg-emerald-600 px-2.5 py-1 text-[10px] font-semibold uppercase text-white">
                 {badge}
               </div>
             )}
             {discountPercent > 0 && (
-              <div className="rounded-xl bg-red-500 px-2.5 py-1.5 text-[9px] font-black text-white shadow-lg shadow-red-500/30">
+              <div className="rounded-md bg-rose-500 px-2 py-1 text-[10px] font-semibold text-white">
                 -{discountPercent}%
               </div>
             )}
           </div>
 
-          {/* Floating Favorite Button */}
+          {/* Favorite Button */}
           <button
             onClick={handleFavorite}
-            className={`absolute bottom-3 right-3 z-20 h-9 w-9 flex items-center justify-center rounded-full shadow-lg transition-all duration-300 active:scale-90 ${isFavorite
-              ? 'bg-red-500 text-white'
-              : 'bg-white/90 backdrop-blur-md text-gray-400 hover:text-red-500 hover:bg-white'
+            className={`absolute bottom-3 right-3 z-20 h-8 w-8 flex items-center justify-center rounded-full shadow-md transition-all duration-200 active:scale-90 ${isFavorite
+              ? 'bg-rose-500 text-white'
+              : 'bg-white text-slate-400 hover:text-rose-500'
               }`}
           >
-            <Heart
-              size={16}
-              className={`${isFavorite ? 'fill-white' : ''}`}
-            />
+            <Heart size={14} className={isFavorite ? 'fill-white' : ''} />
           </button>
 
           {/* Product Image */}
@@ -89,94 +83,69 @@ export function ProductCard({
             <img
               src={image}
               alt={name}
-              className="h-full w-full object-cover transition-transform duration-1000 ease-out group-hover:scale-110"
+              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
           ) : (
-            <div className="w-full h-full flex flex-col items-center justify-center text-gray-200 gap-2">
-              <ImageIcon size={32} strokeWidth={1} className="opacity-20" />
-              <span className="text-[9px] font-black uppercase tracking-widest opacity-30">No Preview</span>
+            <div className="w-full h-full flex flex-col items-center justify-center text-slate-300 gap-2">
+              <ImageIcon size={28} strokeWidth={1.5} />
+              <span className="text-[10px] font-medium uppercase tracking-wider text-slate-400">No Image</span>
             </div>
           )}
-
-          {/* Hover Overlay */}
-          <div className="absolute inset-0 bg-black/0 transition-colors duration-500 group-hover:bg-orange-500/5"></div>
         </div>
 
-        {/* Content Section */}
-        <div className="flex flex-1 flex-col justify-between p-4 gap-3">
-          <div className="space-y-3">
+        {/* Content */}
+        <div className="flex flex-1 flex-col p-4 gap-3">
+          <div className="space-y-2">
             {/* Category */}
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-orange-500 bg-orange-50 px-3 py-1 rounded-full self-start inline-block">
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-emerald-600">
               {category}
             </span>
 
             {/* Title */}
-            <h3 className="line-clamp-2 text-xl font-black text-gray-900 group-hover:text-orange-500 transition-colors tracking-tight leading-tight">
+            <h3 className="line-clamp-2 text-base font-semibold text-slate-800 group-hover:text-emerald-600 transition-colors leading-snug">
               {name}
             </h3>
-
-            {/* Rating */}
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-0.5">
-                {[...Array(5)].map((_, i) => (
-                  <Star
-                    key={i}
-                    size={14}
-                    className={`transition-colors ${i < (rating || 4)
-                      ? 'fill-yellow-400 text-yellow-400'
-                      : 'text-gray-200 dark:text-gray-700'
-                      }`}
-                  />
-                ))}
-              </div>
-              <span className="text-xs font-bold text-gray-400">
-                ({reviews || 128})
-              </span>
-            </div>
           </div>
 
-          <div className="space-y-4 pt-2 border-t border-gray-50">
-            {/* Price Area */}
-            <div className="flex items-end gap-3">
-              <div className="flex flex-col">
-                {originalPrice && originalPrice > price && (
-                  <span className="text-sm line-through text-gray-300 dark:text-gray-600 font-bold leading-none mb-1">
-                    Rs {originalPrice.toLocaleString()}
-                  </span>
-                )}
-                <span className="text-3xl font-black text-gray-900 tracking-tighter leading-none">
-                  Rs {price.toLocaleString()}
-                </span>
-              </div>
+          <div className="mt-auto space-y-3">
+            {/* Price */}
+            <div className="flex items-baseline gap-2">
+              <span className="text-xl font-bold text-slate-800">
+                Rs {price.toLocaleString()}
+              </span>
               {quantity && (
-                <span className="text-xs font-bold text-gray-400 dark:text-gray-500 mb-1">
+                <span className="text-xs font-medium text-slate-400">
                   / {quantity}
                 </span>
               )}
             </div>
 
-            {/* Store Information */}
-            <div className="flex items-center gap-3">
-              <div className="h-8 w-8 rounded-full bg-gradient-to-br from-indigo-500 via-purple-500 to-orange-500 p-[2px] shadow-lg">
-                <div className="h-full w-full rounded-full bg-white flex items-center justify-center text-[10px] font-black text-gray-900 uppercase">
-                  {store.charAt(0) || 'S'}
-                </div>
+            {originalPrice && originalPrice > price && (
+              <span className="text-sm line-through text-slate-400 font-medium">
+                Rs {originalPrice.toLocaleString()}
+              </span>
+            )}
+
+            {/* Store */}
+            <div className="flex items-center gap-2 pt-2 border-t border-slate-100">
+              <div className="h-7 w-7 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600">
+                <Store size={14} />
               </div>
-              <span className="text-sm font-bold text-gray-600 dark:text-gray-300 truncate">
+              <span className="text-xs font-medium text-slate-500 truncate">
                 {store}
               </span>
             </div>
 
-            {/* Add to Cart Premium Button */}
+            {/* Add to Cart Button */}
             <button
               onClick={handleAddCart}
-              className={`w-full flex items-center justify-center gap-3 rounded-2xl py-4 font-black text-xs uppercase tracking-[0.1em] transition-all duration-500 shadow-lg ${isAdded
-                ? 'bg-green-500 text-white shadow-green-200'
-                : 'bg-orange-500 text-white hover:bg-gray-900 hover:shadow-orange-200 active:scale-95'
+              className={`w-full flex items-center justify-center gap-2 rounded-xl py-3 font-semibold text-sm transition-all duration-200 ${isAdded
+                ? 'bg-emerald-600 text-white'
+                : 'bg-slate-100 text-slate-700 hover:bg-emerald-600 hover:text-white active:scale-[0.98]'
                 }`}
             >
-              <ShoppingCart size={20} strokeWidth={2.5} />
-              {isAdded ? 'Success!' : 'Add to Cart'}
+              <ShoppingCart size={16} />
+              {isAdded ? 'Added!' : 'Add to Cart'}
             </button>
           </div>
         </div>

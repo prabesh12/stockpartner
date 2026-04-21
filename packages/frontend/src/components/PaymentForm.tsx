@@ -14,50 +14,53 @@ export const PaymentForm = ({ customer, onSubmit, onClose, isLoading }: PaymentF
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex justify-center items-center p-4">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-sm flex flex-col">
-        <div className="flex justify-between items-center p-6 border-b border-gray-100 bg-green-50 rounded-t-xl">
-          <h2 className="text-xl font-bold text-green-800">Record Payment</h2>
-          <button onClick={onClose} className="text-green-600 hover:bg-green-100 p-2 rounded-full">
-            <X size={20} />
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm flex flex-col">
+        <div className="flex justify-between items-center px-6 py-4 border-b border-slate-100">
+          <div>
+            <h2 className="text-base font-bold text-slate-800">Record Payment</h2>
+            <p className="text-xs text-slate-400 mt-0.5">From: {customer.name}</p>
+          </div>
+          <button onClick={onClose} className="text-slate-400 hover:bg-slate-100 hover:text-slate-700 p-2 rounded-xl transition-colors">
+            <X size={18} />
           </button>
         </div>
-        
-        <form id="payment-form" onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-4">
-          <div className="bg-gray-50 p-3 rounded-lg text-sm mb-2 border border-gray-100">
-            <p className="text-gray-500">Receiving from:</p>
-            <p className="font-bold text-gray-900">{customer.name}</p>
-            <div className="mt-2 flex justify-between">
-               <span className="text-gray-600">Current Due:</span>
-               <span className="font-bold text-red-600">₹{Number(customer.totalDue).toFixed(2)}</span>
+
+        <form id="payment-form" onSubmit={handleSubmit(onSubmit)} className="px-6 py-5 space-y-4">
+          {/* Balance info */}
+          <div className="bg-rose-50 border border-rose-100 rounded-xl p-3.5">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-slate-600">Outstanding Due</span>
+              <span className="font-bold text-rose-600 text-base">₹{Number(customer.totalDue).toFixed(2)}</span>
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Amount Given (₹) *</label>
+            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Amount Received (₹) *</label>
             <input
-              type="number"
-              step="0.01"
+              type="number" step="0.01"
               {...register("amount", { required: "Amount required", valueAsNumber: true, min: { value: 0.01, message: "Must be positive" } })}
-              className="w-full px-4 py-3 text-lg font-bold border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+              className="w-full px-4 py-3 text-lg font-bold border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none text-slate-800 placeholder-slate-300"
               placeholder="0.00"
             />
-            {errors.amount && <p className="text-red-500 text-xs mt-1">{errors.amount.message as string}</p>}
+            {errors.amount && <p className="text-rose-500 text-xs mt-1">{errors.amount.message as string}</p>}
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Notes (Optional)</label>
+            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Notes (Optional)</label>
             <input
               {...register("notes")}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm"
+              className="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm text-slate-700 placeholder-slate-400 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
               placeholder="e.g. Paid in cash"
             />
           </div>
         </form>
 
-        <div className="p-6 border-t border-gray-100 flex justify-end gap-3 bg-gray-50 rounded-b-xl">
-          <button type="button" onClick={onClose} className="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg">Cancel</button>
-          <button type="submit" form="payment-form" disabled={isLoading} className="flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg disabled:opacity-50 transition-colors">
-            <CheckCircle size={18} /> {isLoading ? 'Processing...' : 'Confirm Payment'}
+        <div className="px-6 py-4 border-t border-slate-100 flex justify-end gap-3 bg-slate-50 rounded-b-2xl">
+          <button type="button" onClick={onClose} className="px-5 py-2.5 text-sm font-semibold text-slate-600 bg-white border border-slate-300 rounded-xl hover:bg-slate-50 transition-colors">
+            Cancel
+          </button>
+          <button type="submit" form="payment-form" disabled={isLoading} className="flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl disabled:opacity-50 transition-colors shadow-sm">
+            <CheckCircle size={16} />{isLoading ? 'Processing...' : 'Confirm Payment'}
           </button>
         </div>
       </div>

@@ -11,23 +11,25 @@ export const createSale = async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Sale must contain at least one item' });
     }
 
-    const sale = await prisma.$transaction(async (tx) => {
-      // 1. Validate Stock Limits pre-emptively
-      for (const item of payload.items) {
-        const product = await tx.product.findUnique({
-          where: { id: item.productId }
-        });
+    // ─── Pre-fetch all products OUTSIDE the transaction (fast read) ───────────
+    const productIds = payload.items.map(i => i.productId);
+    const products = await prisma.product.findMany({
+      where: { id: { in: productIds }, shopId },
+    });
 
-        if (!product || product.shopId !== shopId) {
-          throw new Error(`Product ${item.productId} not found`);
-        }
-
-        if (Number(product.currentStock) < item.quantity) {
-          throw new Error(`Insufficient stock for product: ${product.name}`);
-        }
+    // Validate stock availability before entering the transaction
+    const productMap = new Map(products.map(p => [p.id, p]));
+    for (const item of payload.items) {
+      const product = productMap.get(item.productId);
+      if (!product) throw new Error(`Product ${item.productId} not found`);
+      if (Number(product.currentStock) < item.quantity) {
+        throw new Error(`Insufficient stock for product: ${product.name}`);
       }
+    }
 
-      // 2. Insert main Sale Record
+    // ─── Run the transaction with a generous timeout ───────────────────────────
+    const sale = await prisma.$transaction(async (tx) => {
+      // 1. Insert main Sale record
       const newSale = await tx.sale.create({
         data: {
           shopId,
@@ -42,9 +44,8 @@ export const createSale = async (req: Request, res: Response) => {
         }
       });
 
-      // 3. Process Items and update Inventory concurrently
-      for (const item of payload.items) {
-        // Create line item
+      // 2. Process all items in parallel (create line-items, deduct stock, write audit)
+      await Promise.all(payload.items.map(async (item) => {
         await tx.saleItem.create({
           data: {
             saleId: newSale.id,
@@ -55,15 +56,11 @@ export const createSale = async (req: Request, res: Response) => {
           }
         });
 
-        // Deduct logic
         const updatedProduct = await tx.product.update({
           where: { id: item.productId },
-          data: {
-            currentStock: { decrement: item.quantity }
-          }
+          data: { currentStock: { decrement: item.quantity } }
         });
 
-        // Write Audit ledger
         await tx.stockMovement.create({
           data: {
             shopId,
@@ -76,88 +73,72 @@ export const createSale = async (req: Request, res: Response) => {
             notes: 'POS Sale Checkout'
           }
         });
-      }
+      }));
 
-      // 4. Resolve Credit / Udhar Ledger logic
+      // 3. Resolve Credit / Udhar Ledger logic
       if (payload.customerId) {
-        if (payload.finalAmount > payload.paidAmount) {
-          const debtIncurred = payload.finalAmount - payload.paidAmount;
+        const debtIncurred = payload.finalAmount - payload.paidAmount;
+        const isPartiallyPaid = debtIncurred > 0;
+        const isFullyPaid = payload.finalAmount === payload.paidAmount && payload.finalAmount > 0;
 
+        if (isPartiallyPaid || isFullyPaid) {
+          // Read the customer's latest balance
           const latestLedger = await tx.customerLedger.findFirst({
             where: { customerId: payload.customerId },
             orderBy: { createdAt: 'desc' }
           });
           const currentBalance = latestLedger ? Number(latestLedger.balanceAfter) : 0;
 
-          // Double Entry 1: Write Full Sale as CREDIT
+          // Double Entry 1: Record full sale as CREDIT (debt created)
           const creditBalAfter = currentBalance + payload.finalAmount;
           await tx.customerLedger.create({
-             data: {
+            data: {
+              shopId,
+              customerId: payload.customerId,
+              userId,
+              type: 'CREDIT',
+              amount: payload.finalAmount,
+              balanceAfter: creditBalAfter,
+              referenceId: newSale.id,
+              notes: isFullyPaid ? 'Sale Issued (Fully Paid)' : 'Sale Issued',
+            }
+          });
+
+          // Double Entry 2: Record any upfront payment as PAYMENT (debt offset)
+          let finalBalAfter = creditBalAfter;
+          if (payload.paidAmount > 0) {
+            finalBalAfter = creditBalAfter - payload.paidAmount;
+            await tx.customerLedger.create({
+              data: {
                 shopId,
                 customerId: payload.customerId,
                 userId,
-                type: 'CREDIT',
-                amount: payload.finalAmount,
-                balanceAfter: creditBalAfter,
+                type: 'PAYMENT',
+                amount: payload.paidAmount,
+                balanceAfter: finalBalAfter,
                 referenceId: newSale.id,
-                notes: 'Sale Issued'
-             }
-          });
-
-          // Double Entry 2: Write Partial Payment to offset if applicable natively
-          let finalBalAfter = creditBalAfter;
-          if (payload.paidAmount > 0) {
-             finalBalAfter = creditBalAfter - payload.paidAmount;
-             await tx.customerLedger.create({
-                data: {
-                   shopId,
-                   customerId: payload.customerId,
-                   userId,
-                   type: 'PAYMENT',
-                   amount: payload.paidAmount,
-                   balanceAfter: finalBalAfter,
-                   referenceId: newSale.id,
-                   notes: `Upfront Payment via ${payload.paymentMethod}`
-                }
-             });
+                notes: `${isFullyPaid ? 'Fully Paid' : 'Upfront Payment'} via ${payload.paymentMethod}`,
+              }
+            });
           }
 
-          // Persist the top-level metric on Customer record natively
+          // Update the customer's running total
           await tx.customer.update({
             where: { id: payload.customerId },
             data: { totalDue: finalBalAfter }
-          });
-        } else if (payload.finalAmount === payload.paidAmount && payload.finalAmount > 0) {
-           // Fully paid exactly, maybe track history for consistency
-          const latestLedger = await tx.customerLedger.findFirst({
-            where: { customerId: payload.customerId },
-            orderBy: { createdAt: 'desc' }
-          });
-          const currBal = latestLedger ? Number(latestLedger.balanceAfter) : 0;
-          
-          await tx.customerLedger.create({
-            data: {
-               shopId, customerId: payload.customerId, userId,
-               type: 'CREDIT', amount: payload.finalAmount, balanceAfter: currBal + payload.finalAmount,
-               referenceId: newSale.id, notes: 'Sale Issued (Fully Paid)'
-            }
-          });
-          await tx.customerLedger.create({
-            data: {
-               shopId, customerId: payload.customerId, userId,
-               type: 'PAYMENT', amount: payload.paidAmount, balanceAfter: currBal, // Nets back down to original safely
-               referenceId: newSale.id, notes: `Fully Paid Upfront via ${payload.paymentMethod}`
-            }
           });
         }
       }
 
       return newSale;
+    }, {
+      timeout: 15000,  // 15s max transaction duration
+      maxWait: 5000,   // 5s max wait to acquire a connection
     });
 
     res.status(201).json(sale);
   } catch (error: any) {
     console.error('POS Checkout Error:', error);
-    res.status(400).json({ error: error.message || 'Failed to process POS checkout natively' });
+    res.status(400).json({ error: error.message || 'Failed to process POS checkout' });
   }
 };

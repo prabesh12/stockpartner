@@ -10,7 +10,6 @@ export const ResetPassword = () => {
   const { register, handleSubmit, watch, formState: { errors } } = useForm<any>();
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
-  
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
@@ -19,13 +18,9 @@ export const ResetPassword = () => {
       toast.error('Token is missing. Please use the link from your email.');
       return;
     }
-
     setIsLoading(true);
     try {
-      const payload: ResetPasswordRequest = {
-        token,
-        newPassword: data.password
-      };
+      const payload: ResetPasswordRequest = { token, newPassword: data.password };
       await authService.resetPassword(payload);
       setIsSuccess(true);
       toast.success('Password updated!');
@@ -38,100 +33,80 @@ export const ResetPassword = () => {
 
   if (!token) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 text-center border border-gray-100">
-           <h2 className="text-2xl font-bold text-gray-900 mb-4">Invalid Reset Link</h2>
-           <p className="text-gray-500 mb-8">This link is invalid or expired. Please request a new one.</p>
-            <Link 
-              to="/forgot-password"
-              className="inline-block w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl transition-all"
-            >
-              Request New Link
-            </Link>
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+        <div className="max-w-md w-full bg-white rounded-2xl border border-slate-200 shadow-sm p-8 text-center">
+          <h2 className="text-2xl font-bold text-slate-800 mb-3">Invalid Reset Link</h2>
+          <p className="text-slate-500 text-sm mb-8">This link is invalid or expired. Please request a new one.</p>
+          <Link to="/forgot-password" className="inline-block w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 px-6 rounded-xl transition-colors">
+            Request New Link
+          </Link>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
-        <div className="mb-8">
-          <h2 className="text-3xl font-extrabold text-gray-900 mb-2">New Password</h2>
-          <p className="text-gray-500">Choose a strong password to secure your account.</p>
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+      <div className="max-w-md w-full bg-white rounded-2xl border border-slate-200 shadow-sm p-8">
+        <div className="mb-7">
+          <h2 className="text-2xl font-bold text-slate-800 mb-1.5">New Password</h2>
+          <p className="text-slate-500 text-sm">Choose a strong password to secure your account.</p>
         </div>
 
         {isSuccess ? (
           <div className="text-center">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <CheckCircle className="text-green-600 w-10 h-10" />
+            <div className="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-5">
+              <CheckCircle className="text-emerald-600 w-9 h-9" />
             </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">Success!</h3>
-            <p className="text-gray-600 mb-8">Your password has been reset successfully. You can now sign in with your new credentials.</p>
-            <Link 
-              to="/login"
-              className="w-full flex justify-center items-center gap-2 py-3 px-4 border border-transparent rounded-xl shadow-lg text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 transition-all font-bold"
-            >
-              Sign In Now <ArrowRight size={18} />
+            <h3 className="text-lg font-bold text-slate-800 mb-2">Password Updated!</h3>
+            <p className="text-slate-500 text-sm mb-7">You can now sign in with your new credentials.</p>
+            <Link to="/login" className="w-full flex justify-center items-center gap-2 py-3 rounded-xl font-semibold text-white bg-emerald-600 hover:bg-emerald-700 transition-colors">
+              Sign In Now <ArrowRight size={16} />
             </Link>
           </div>
         ) : (
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">New Password</label>
+              <label className="block text-sm font-semibold text-slate-700 mb-1.5">New Password</label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                   <Lock size={18} />
                 </div>
                 <input
-                  {...register("password", { 
-                    required: "Password is required",
-                    minLength: { value: 6, message: "At least 6 characters" }
-                  })}
+                  {...register("password", { required: "Password is required", minLength: { value: 6, message: "At least 6 characters" } })}
                   type="password"
-                  className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl bg-gray-50 placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all sm:text-sm"
+                  className="block w-full pl-11 pr-4 py-2.5 border border-slate-300 rounded-xl text-slate-800 placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
                   placeholder="••••••••"
                 />
               </div>
-              {errors.password && <p className="text-red-500 text-xs mt-1 font-medium">{errors.password.message as string}</p>}
+              {errors.password && <p className="text-rose-500 text-xs mt-1.5 font-medium">{errors.password.message as string}</p>}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+              <label className="block text-sm font-semibold text-slate-700 mb-1.5">Confirm Password</label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                   <Lock size={18} />
                 </div>
                 <input
-                  {...register("confirmPassword", { 
+                  {...register("confirmPassword", {
                     required: "Please confirm your password",
-                    validate: (val: string) => {
-                      if (watch('password') !== val) {
-                        return "Passwords do not match";
-                      }
-                    },
+                    validate: (val: string) => watch('password') !== val ? "Passwords do not match" : true
                   })}
                   type="password"
-                  className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl bg-gray-50 placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all sm:text-sm"
+                  className="block w-full pl-11 pr-4 py-2.5 border border-slate-300 rounded-xl text-slate-800 placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
                   placeholder="••••••••"
                 />
               </div>
-              {errors.confirmPassword && <p className="text-red-500 text-xs mt-1 font-medium">{errors.confirmPassword.message as string}</p>}
+              {errors.confirmPassword && <p className="text-rose-500 text-xs mt-1.5 font-medium">{errors.confirmPassword.message as string}</p>}
             </div>
 
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full flex justify-center items-center gap-2 py-3 px-4 border border-transparent rounded-xl shadow-lg text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 transition-all"
+              className="w-full flex justify-center items-center gap-2 py-3 rounded-xl font-semibold text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 transition-colors shadow-sm"
             >
-              {isLoading ? (
-                <>
-                  <Loader2 className="animate-spin" size={18} />
-                  Updating password...
-                </>
-              ) : (
-                'Reset Password'
-              )}
+              {isLoading ? <><Loader2 className="animate-spin" size={18} />Updating...</> : 'Reset Password'}
             </button>
           </form>
         )}
