@@ -6,6 +6,8 @@ import { X, Save, Plus, Check } from 'lucide-react';
 import { RootState, AppDispatch } from '@/store';
 import { addShopCategory } from '@/store/slices/authSlice';
 
+import { ImagePicker } from './ImagePicker';
+
 interface ProductFormProps {
   initialData?: ProductDTO | null;
   onSubmit: (data: any) => Promise<void>;
@@ -214,6 +216,25 @@ export const ProductForm = ({ initialData, onSubmit, onClose, isLoading }: Produ
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder="Scan or type barcode"
                 />
+              </div>
+
+              <div className="col-span-1 md:col-span-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-1">Product Description</label>
+                <textarea
+                  {...register("description")}
+                  rows={3}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Tell customers more about your product..."
+                />
+              </div>
+
+              <div className="col-span-1 md:col-span-2">
+                <ImagePicker 
+                  label="Product Image"
+                  initialValue={watch('imageUrl')}
+                  onUploadSuccess={(url) => setValue('imageUrl', url)}
+                />
+                <input type="hidden" {...register("imageUrl")} />
               </div>
             </div>
           </form>

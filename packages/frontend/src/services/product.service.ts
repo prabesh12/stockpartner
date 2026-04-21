@@ -50,6 +50,24 @@ const productService = {
       headers: getAuthHeaders(),
     });
     if (!res.ok) throw new Error('Failed to delete product');
+  },
+
+  async getPublicProducts(category?: string, search?: string): Promise<ProductDTO[]> {
+    let url = `${API_BASE_URL}/products/public`;
+    const params = new URLSearchParams();
+    if (category) params.append('category', category);
+    if (search) params.append('search', search);
+    if (params.toString()) url += `?${params.toString()}`;
+
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('Failed to fetch public products');
+    return res.json();
+  },
+
+  async getPublicProductDetail(id: string): Promise<ProductDTO & { shop: { name: string; contactNumber: string; address: string } }> {
+    const res = await fetch(`${API_BASE_URL}/products/public/${id}`);
+    if (!res.ok) throw new Error('Failed to fetch product details');
+    return res.json();
   }
 };
 

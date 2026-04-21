@@ -47,6 +47,8 @@ export const createProduct = async (req: Request, res: Response) => {
           costPrice: data.costPrice as number,
           sellingPrice: data.sellingPrice as number,
           currentStock: initialStock,
+          description: data.description?.trim() || null,
+          imageUrl: data.imageUrl?.trim() || null,
         }
       });
 
@@ -111,6 +113,8 @@ export const updateProduct = async (req: Request, res: Response) => {
              unitType: data.unitType !== undefined ? data.unitType : existingProduct.unitType,
              costPrice: data.costPrice !== undefined ? data.costPrice : existingProduct.costPrice,
              sellingPrice: data.sellingPrice !== undefined ? data.sellingPrice : existingProduct.sellingPrice,
+             description: data.description !== undefined ? data.description : existingProduct.description,
+             imageUrl: data.imageUrl !== undefined ? data.imageUrl : existingProduct.imageUrl,
              currentStock: { increment: delta }
            }
          });
@@ -139,6 +143,8 @@ export const updateProduct = async (req: Request, res: Response) => {
              unitType: data.unitType !== undefined ? data.unitType : existingProduct.unitType,
              costPrice: data.costPrice !== undefined ? data.costPrice : existingProduct.costPrice,
              sellingPrice: data.sellingPrice !== undefined ? data.sellingPrice : existingProduct.sellingPrice,
+             description: data.description !== undefined ? data.description : existingProduct.description,
+             imageUrl: data.imageUrl !== undefined ? data.imageUrl : existingProduct.imageUrl,
            }
          });
       }
@@ -171,5 +177,71 @@ export const deleteProduct = async (req: Request, res: Response) => {
   } catch (error) {
     console.error('deleteProduct error:', error);
     res.status(500).json({ error: 'Failed to delete product' });
+  }
+};
+
+// PUBLIC MARKETPLACE ENDPOINTS
+export const getPublicProducts = async (req: Request, res: Response) => {
+  try {
+    const { category, search } = req.query;
+
+    const products = await prisma.product.findMany({
+      where: {
+        shop: {
+          users: {
+            some: {
+              isVerified: true,
+              role: 'OWNER'
+            }
+          }
+        },
+        OR: search ? [
+          { name: { contains: search as string, mode: 'insensitive' } },
+          { category: { contains: search as string, mode: 'insensitive' } }
+        ] : undefined,
+        category: category ? { equals: category as string, mode: 'insensitive' } : undefined,
+      },
+      include: {
+        shop: {
+          select: {
+            name: true
+          }
+        }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+
+    res.json(products);
+  } catch (error) {
+    console.error('getPublicProducts error:', error);
+    res.status(500).json({ error: 'Failed to fetch public products' });
+  }
+};
+
+export const getPublicProductDetail = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    const product = await prisma.product.findUnique({
+      where: { id },
+      include: {
+        shop: {
+          select: {
+            name: true,
+            contactNumber: true,
+            address: true
+          }
+        }
+      }
+    });
+
+    if (!product) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+
+    res.json(product);
+  } catch (error) {
+    console.error('getPublicProductDetail error:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 };

@@ -20,6 +20,9 @@ import { ForgotPassword } from '@/pages/ForgotPassword';
 import { ResetPassword } from '@/pages/ResetPassword';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 
+import { Marketplace } from '@/pages/Marketplace';
+import { PublicProductDetail } from '@/pages/PublicProductDetail';
+
 function App() {
   const dispatch = useDispatch<AppDispatch>();
   const { user, token } = useSelector((state: RootState) => state.auth);
@@ -51,7 +54,8 @@ function App() {
 
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/dashboard" replace />} />
+      <Route path="/" element={<Marketplace />} />
+      <Route path="/product/:id" element={<PublicProductDetail />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/verify-email" element={<VerifyEmail />} />

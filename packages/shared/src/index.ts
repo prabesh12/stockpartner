@@ -57,6 +57,8 @@ export interface CreateProductRequest {
   sellingPrice?: number;
   currentStock?: number;
   lowStockThreshold?: number;
+  description?: string;
+  imageUrl?: string;
 }
 
 export interface UpdateProductRequest extends Partial<CreateProductRequest> {}
@@ -73,6 +75,8 @@ export interface ProductDTO {
   sellingPrice: number;
   currentStock: number;
   lowStockThreshold: number | null;
+  description: string | null;
+  imageUrl: string | null;
   createdAt: string;
   updatedAt: string;
 }
