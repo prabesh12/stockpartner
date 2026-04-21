@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ShoppingBag, ArrowLeft, Phone, MapPin, Share2, ShieldCheck, Truck, Clock, Star, Copy, Check, Heart, MessageCircle, Store, Package, Sparkles } from 'lucide-react';
+import { ShoppingBag, ArrowLeft, Phone, MapPin, Share2, ShieldCheck, Truck, Clock, Star, Copy, Check, Heart, Store, Package, Sparkles, ExternalLink, Navigation, X, Loader2 } from 'lucide-react';
 import productService from '@/services/product.service';
+import { MapComponent } from '@/components/MapComponent';
 import { ProductDTO } from 'shared';
+import toast from 'react-hot-toast';
 
 export const PublicProductDetail = () => {
     const { id } = useParams();
@@ -16,7 +18,36 @@ export const PublicProductDetail = () => {
     const [phoneCopied, setPhoneCopied] = useState(false);
     const [shopProducts, setShopProducts] = useState<ProductDTO[]>([]);
     const [shopProductsLoading, setShopProductsLoading] = useState(false);
+    
+    // Map & Geolocation state
+    const [showMapModal, setShowMapModal] = useState(false);
+    const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
+    const [locating, setLocating] = useState(false);
 
+    const handleViewOnMap = () => {
+        if (!navigator.geolocation) {
+            toast.error("Geolocation is not supported by your browser");
+            return;
+        }
+
+        setLocating(true);
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                setUserLocation([position.coords.latitude, position.coords.longitude]);
+                setShowMapModal(true);
+                setLocating(false);
+            },
+            () => {
+                setLocating(false);
+                toast.error("Please allow location access to see the route");
+                // Open modal anyway with just the shop location if they deny, 
+                // but for "path and distance" we need user location.
+                // Let's show the map with just shop pin if denied.
+                setShowMapModal(true);
+            },
+            { enableHighAccuracy: true, timeout: 5000 }
+        );
+    };
     useEffect(() => {
         const fetchDetail = async () => {
             if (!id) return;
@@ -265,21 +296,33 @@ export const PublicProductDetail = () => {
 
                         {/* Contact Details */}
                         <div className="flex flex-col gap-2">
-                            <div className="flex items-center gap-3 p-2.5 bg-slate-50 rounded-lg">
-                                <MapPin size={16} className="text-slate-400 shrink-0" />
-                                <span className="text-sm text-slate-600 truncate">{product.shop.address || 'Address not provided'}</span>
+                            <div className="flex items-center gap-3 p-2.5 bg-slate-50 rounded-xl border border-slate-100">
+                                <MapPin size={16} className="text-emerald-500 shrink-0" />
+                                <div className="flex-1 min-w-0 flex items-center justify-between">
+                                    <span className="text-sm text-slate-600 truncate">{product.shop.address || 'Address not provided'}</span>
+                                    {product.shop.address && (
+                                        <button 
+                                            onClick={handleViewOnMap}
+                                            disabled={locating}
+                                            className="text-[11px] font-bold text-emerald-600 hover:text-emerald-700 underline underline-offset-2 flex items-center gap-1 ml-2 shrink-0 disabled:opacity-50"
+                                        >
+                                            {locating ? <Loader2 size={10} className="animate-spin" /> : <Navigation size={10} />}
+                                            (View on Map)
+                                        </button>
+                                    )}
+                                </div>
                             </div>
 
-                            <div className="flex items-center gap-3 p-2.5 bg-slate-50 rounded-lg">
-                                <Phone size={16} className="text-slate-400 shrink-0" />
+                            <div className="flex items-center gap-3 p-2.5 bg-slate-50 rounded-xl border border-slate-100">
+                                <Phone size={16} className="text-emerald-500 shrink-0" />
                                 <span className="text-sm text-slate-600 flex-1">{product.shop.contactNumber || 'No contact number'}</span>
                                 {product.shop.contactNumber && (
                                     <button
                                         onClick={handleCopyPhone}
-                                        className="p-1.5 hover:bg-slate-200 rounded-md transition-colors"
+                                        className="p-1.5 hover:bg-white hover:shadow-sm rounded-md transition-all active:scale-95"
                                     >
                                         {phoneCopied ? (
-                                            <Check size={14} className="text-emerald-500" />
+                                            <Check size={14} className="text-emerald-600" />
                                         ) : (
                                             <Copy size={14} className="text-slate-400" />
                                         )}
@@ -287,6 +330,30 @@ export const PublicProductDetail = () => {
                                 )}
                             </div>
                         </div>
+
+                        {/* Map View */}
+                        {(product as any).latitude && (product as any).longitude && (
+                            <div className="space-y-3 pt-1">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-xs font-bold text-slate-800 uppercase tracking-wider">Shop Location</span>
+                                    <a
+                                        href={`https://www.google.com/maps/search/?api=1&query=${(product as any).latitude},${(product as any).longitude}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-[11px] font-bold text-emerald-600 hover:text-emerald-700 flex items-center gap-1 transition-colors"
+                                    >
+                                        <ExternalLink size={12} /> Directions
+                                    </a>
+                                </div>
+                                <div className="rounded-xl overflow-hidden shadow-sm border border-slate-200">
+                                    <MapComponent
+                                        mode="display"
+                                        location={[(product as any).latitude, (product as any).longitude]}
+                                        zoom={15}
+                                    />
+                                </div>
+                            </div>
+                        )}
 
                         {/* CTA Buttons */}
                         <div className="flex flex-col gap-2.5 pt-1">
@@ -297,11 +364,6 @@ export const PublicProductDetail = () => {
                                 <Phone size={18} />
                                 Call to Purchase
                             </a>
-
-                            <button className="w-full bg-slate-100 text-slate-700 flex items-center justify-center gap-2.5 py-3.5 rounded-xl font-semibold hover:bg-slate-200 transition-colors active:scale-[0.99]">
-                                <MessageCircle size={18} />
-                                Send Message
-                            </button>
                         </div>
                     </div>
 
@@ -395,6 +457,56 @@ export const PublicProductDetail = () => {
                     </div>
                 </div>
             </footer>
+            {/* Map Modal */}
+            {showMapModal && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
+                    <div className="bg-white w-full max-w-2xl rounded-3xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200">
+                        <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                            <div>
+                                <h3 className="font-bold text-slate-800">Shop Location & Route</h3>
+                                <p className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">
+                                    {userLocation ? 'Optimal route calculated' : 'Viewing shop location'}
+                                </p>
+                            </div>
+                            <button 
+                                onClick={() => setShowMapModal(false)}
+                                className="p-2 hover:bg-slate-200 rounded-xl transition-colors text-slate-400 hover:text-slate-600"
+                            >
+                                <X size={20} />
+                            </button>
+                        </div>
+                        
+                        <div className="p-1">
+                            <MapComponent 
+                                mode={userLocation ? 'routing' : 'display'}
+                                location={[(product as any).latitude, (product as any).longitude]}
+                                userLocation={userLocation}
+                                zoom={14}
+                            />
+                        </div>
+
+                        <div className="p-4 bg-emerald-50/50 border-t border-emerald-100 flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <div className="p-2 bg-emerald-100 rounded-lg text-emerald-600">
+                                    <MapPin size={16} />
+                                </div>
+                                <div className="text-left">
+                                    <p className="text-[10px] uppercase font-bold text-emerald-600 tracking-tight">Destination</p>
+                                    <p className="text-sm font-semibold text-slate-800">{product.shop.name}</p>
+                                </div>
+                            </div>
+                            <a 
+                                href={`https://www.google.com/maps/search/?api=1&query=${(product as any).latitude},${(product as any).longitude}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="px-4 py-2 bg-emerald-600 text-white rounded-xl text-xs font-bold hover:bg-emerald-700 transition-colors flex items-center gap-2 shadow-sm"
+                            >
+                                <Navigation size={14} /> Open in Google Maps
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

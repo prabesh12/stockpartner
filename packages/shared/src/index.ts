@@ -36,6 +36,9 @@ export interface RegisterRequest {
   phone?: string;
   password?: string;
   categories?: string[];
+  latitude?: number;
+  longitude?: number;
+  address?: string;
 }
 
 export interface ForgotPasswordRequest {

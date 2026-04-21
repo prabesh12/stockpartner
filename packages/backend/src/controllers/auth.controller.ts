@@ -16,10 +16,10 @@ const generateToken = (userId: string, shopId: string, role: string): string => 
 
 export const register = async (req: Request, res: Response) => {
   try {
-    const { shopName, userName, email, phone, password, categories } = req.body as RegisterRequest;
+    const { shopName, userName, email, phone, password, categories, latitude, longitude, address } = req.body as RegisterRequest;
 
-    if (!shopName || !userName || !password || (!email && !phone)) {
-      return res.status(400).json({ error: 'Missing required fields' });
+    if (!shopName || !userName || !password || !email || !phone) {
+      return res.status(400).json({ error: 'Missing required fields (Email, Phone, Shop Name, Owner Name, and Password are all required)' });
     }
 
     if (email) {
@@ -46,6 +46,10 @@ export const register = async (req: Request, res: Response) => {
         data: { 
           name: shopName,
           categories: categories || [],
+          contactNumber: phone,
+          address: address || null,
+          latitude: latitude ? parseFloat(latitude as any) : null,
+          longitude: longitude ? parseFloat(longitude as any) : null,
         },
       });
 
@@ -103,12 +107,9 @@ export const login = async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Missing credentials' });
     }
 
-    const user = await prisma.user.findFirst({
+    const user = await prisma.user.findUnique({
       where: {
-        OR: [
-          { email: email || undefined },
-          { phone: phone || undefined },
-        ].filter(condition => Object.values(condition)[0] !== undefined),
+        email: email,
       },
       include: {
         shop: true,

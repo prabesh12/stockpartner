@@ -6,7 +6,8 @@ import { registerUser, clearError } from '@/store/slices/authSlice';
 import { RootState, AppDispatch } from '@/store';
 import { RegisterRequest } from 'shared';
 import toast from 'react-hot-toast';
-import { ShoppingBag, Plus, X, Mail, CheckCircle } from 'lucide-react';
+import { ShoppingBag, Plus, X, Mail, CheckCircle, MapPin, Loader2, Info } from 'lucide-react';
+import { MapComponent } from '@/components/MapComponent';
 
 export const Register = () => {
   const { register, handleSubmit, formState: { errors } } = useForm<RegisterRequest>();
@@ -18,6 +19,46 @@ export const Register = () => {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [customCategory, setCustomCategory] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
+  
+  // Geolocation state
+  const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [locationStatus, setLocationStatus] = useState<'idle' | 'checking' | 'captured' | 'denied' | 'error'>('idle');
+  const [locationMessage, setLocationMessage] = useState('');
+
+  const requestLocation = () => {
+    if (!navigator.geolocation) {
+      setLocationStatus('error');
+      setLocationMessage('Geolocation is not supported');
+      return;
+    }
+
+    setLocationStatus('checking');
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const coords = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude
+        };
+        setLocation(coords);
+        setLocationStatus('captured');
+        setLocationMessage('Location captured successfully');
+      },
+      (err) => {
+        if (err.code === 1) { // PERMISSION_DENIED
+          setLocationStatus('denied');
+          setLocationMessage('Location permission denied');
+        } else {
+          setLocationStatus('error');
+          setLocationMessage('Unable to retrieve location');
+        }
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  };
+
+  useEffect(() => {
+    requestLocation();
+  }, []);
 
   const toggleCategory = (cat: string) => {
     setSelectedCategories(prev =>
@@ -39,7 +80,12 @@ export const Register = () => {
   }, [isAuthenticated, navigate, dispatch]);
 
   const onSubmit = async (data: RegisterRequest) => {
-    const payload = { ...data, categories: selectedCategories };
+    const payload = { 
+      ...data, 
+      categories: selectedCategories,
+      latitude: location?.lat,
+      longitude: location?.lng
+    };
     try {
       await dispatch(registerUser(payload)).unwrap();
       setIsSuccess(true);
@@ -93,54 +139,153 @@ export const Register = () => {
           <p className="text-slate-500 text-sm mt-1">Set up your store and start managing inventory in minutes.</p>
         </div>
 
-        <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
-          {/* Shop Name */}
-          <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Shop Name</label>
-            <input
-              {...register("shopName", { required: "Shop Name is required" })}
-              type="text"
-              className={inputClass}
-              placeholder="My Awesome Shop"
-            />
-            {errors.shopName && <span className="text-xs text-rose-500 mt-1 block">{errors.shopName.message}</span>}
+        <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+          {/* Section 1: Account Information */}
+          <div className="space-y-4">
+             <div className="flex items-center gap-2 pb-1 border-b border-slate-100">
+                <div className="w-1.5 h-4 bg-emerald-500 rounded-full"></div>
+                <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider">Account Credentials</h3>
+             </div>
+             
+             <div>
+               <label className="block text-sm font-semibold text-slate-700 mb-1.5">Email Address (Login ID)</label>
+               <input
+                 {...register("email", { 
+                    required: "Email is required for authentication",
+                    pattern: {
+                       value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+                       message: "Invalid email format"
+                    }
+                 })}
+                 type="email"
+                 className={inputClass}
+                 placeholder="owner@shop.com"
+               />
+               {errors.email && <span className="text-xs text-rose-500 mt-1 block">{errors.email.message}</span>}
+             </div>
+
+             <div>
+               <label className="block text-sm font-semibold text-slate-700 mb-1.5">Password</label>
+               <input
+                 {...register("password", { required: "Password is required" })}
+                 type="password"
+                 className={inputClass}
+                 placeholder="••••••••"
+               />
+               {errors.password && <span className="text-xs text-rose-500 mt-1 block">{errors.password.message}</span>}
+             </div>
           </div>
 
-          {/* Owner Name */}
-          <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Your Name (Owner)</label>
-            <input
-              {...register("userName", { required: "Your name is required" })}
-              type="text"
-              className={inputClass}
-              placeholder="John Doe"
-            />
-            {errors.userName && <span className="text-xs text-rose-500 mt-1 block">{errors.userName.message}</span>}
+          {/* Section 2: Shop Details */}
+          <div className="space-y-4 pt-2">
+             <div className="flex items-center gap-2 pb-1 border-b border-slate-100">
+                <div className="w-1.5 h-4 bg-emerald-500 rounded-full"></div>
+                <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider">Shop & Contact Details</h3>
+             </div>
+
+             <div>
+               <label className="block text-sm font-semibold text-slate-700 mb-1.5">Shop Name</label>
+               <input
+                 {...register("shopName", { required: "Shop Name is required" })}
+                 type="text"
+                 className={inputClass}
+                 placeholder="My Awesome Shop"
+               />
+               {errors.shopName && <span className="text-xs text-rose-500 mt-1 block">{errors.shopName.message}</span>}
+             </div>
+
+             <div>
+               <label className="block text-sm font-semibold text-slate-700 mb-1.5">Owner Full Name</label>
+               <input
+                 {...register("userName", { required: "Owner name is required" })}
+                 type="text"
+                 className={inputClass}
+                 placeholder="John Doe"
+               />
+               {errors.userName && <span className="text-xs text-rose-500 mt-1 block">{errors.userName.message}</span>}
+             </div>
+
+             <div>
+               <label className="block text-sm font-semibold text-slate-700 mb-1.5">Contact Number (For Customers)</label>
+               <input
+                 {...register("phone", { 
+                   required: "Contact number is required for customers to reach you",
+                   pattern: {
+                     value: /^[0-9+() -]{7,15}$/,
+                     message: "Please enter a valid contact number"
+                   }
+                 })}
+                 type="tel"
+                 className={inputClass}
+                 placeholder="+977 98XXXXXXXX"
+               />
+               <p className="text-[10px] text-slate-400 mt-1">This number will be displayed on your products for direct calls.</p>
+               {errors.phone && <span className="text-xs text-rose-500 mt-1 block">{errors.phone.message}</span>}
+             </div>
+
+             <div>
+               <label className="block text-sm font-semibold text-slate-700 mb-1.5">Physical Shop Address</label>
+               <textarea
+                 {...register("address", { required: "Physical address is required" })}
+                 className={`${inputClass} min-h-[80px] resize-none`}
+                 placeholder="City, Street, Landmark..."
+               />
+               {errors.address && <span className="text-xs text-rose-500 mt-1 block">{errors.address.message}</span>}
+             </div>
           </div>
 
-          {/* Email */}
-          <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Email Address</label>
-            <input
-              {...register("email", { required: "Email is required" })}
-              type="email"
-              className={inputClass}
-              placeholder="owner@shop.com"
-            />
-            {errors.email && <span className="text-xs text-rose-500 mt-1 block">{errors.email.message}</span>}
+          {/* Location Status */}
+          <div className="pt-2 space-y-3">
+             <div className="flex items-center justify-between">
+                <div>
+                   <label className="block text-sm font-semibold text-slate-700">Shop Location</label>
+                   <p className="text-[10px] text-slate-400 mt-0.5">Click on the map to set your exact location</p>
+                </div>
+                <button 
+                   type="button"
+                   onClick={requestLocation}
+                   className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-700 rounded-lg text-xs font-bold hover:bg-emerald-100 transition-colors"
+                >
+                   <MapPin size={14} /> 
+                   {locationStatus === 'checking' ? 'Locating...' : 'Use GPS'}
+                </button>
+             </div>
+
+             <div className="relative group">
+                <MapComponent 
+                   mode="picker"
+                   location={location ? [location.lat, location.lng] : null}
+                   onLocationSelect={(lat, lng) => {
+                      setLocation({ lat, lng });
+                      setLocationStatus('captured');
+                      setLocationMessage('Location selected on map');
+                   }}
+                />
+             </div>
+
+             <div className={`flex items-center gap-2.5 p-3 rounded-xl border text-sm font-medium ${
+               locationStatus === 'captured' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' :
+               locationStatus === 'denied' ? 'bg-amber-50 text-amber-700 border-amber-100' :
+               'bg-slate-50 text-slate-600 border-slate-100'
+             }`}>
+               {locationStatus === 'checking' && <Loader2 size={16} className="animate-spin text-slate-400" />}
+               {locationStatus === 'captured' && <MapPin size={16} className="text-emerald-500" />}
+               {(locationStatus === 'denied' || locationStatus === 'error') && (
+                  <button type="button" onClick={requestLocation} className="hover:scale-110 transition-transform">
+                     <Info size={16} className="text-amber-500" />
+                  </button>
+               )}
+               
+               <span className="flex-1 truncate">{locationMessage || 'Click the map or use GPS'}</span>
+               
+               {locationStatus === 'captured' && location && (
+                 <span className="text-[10px] bg-white px-1.5 py-0.5 rounded border border-emerald-200">
+                   {location.lat.toFixed(4)}, {location.lng.toFixed(4)}
+                 </span>
+               )}
+             </div>
           </div>
 
-          {/* Password */}
-          <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Password</label>
-            <input
-              {...register("password", { required: "Password is required" })}
-              type="password"
-              className={inputClass}
-              placeholder="••••••••"
-            />
-            {errors.password && <span className="text-xs text-rose-500 mt-1 block">{errors.password.message}</span>}
-          </div>
 
           {/* Categories */}
           <div className="pt-4 border-t border-slate-100">
