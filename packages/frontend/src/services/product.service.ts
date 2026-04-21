@@ -74,6 +74,14 @@ const productService = {
     const res = await fetch(`${API_BASE_URL}/products/public/categories`);
     if (!res.ok) throw new Error('Failed to fetch categories');
     return res.json();
+  },
+
+  async getShopProducts(shopId: string, excludeId?: string): Promise<ProductDTO[]> {
+    let url = `${API_BASE_URL}/products/public/shop/${shopId}/products`;
+    if (excludeId) url += `?excludeId=${excludeId}`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('Failed to fetch shop products');
+    return res.json();
   }
 };
 

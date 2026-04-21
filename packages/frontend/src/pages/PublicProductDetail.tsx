@@ -14,6 +14,8 @@ export const PublicProductDetail = () => {
     const [copied, setCopied] = useState(false);
     const [isWishlisted, setIsWishlisted] = useState(false);
     const [phoneCopied, setPhoneCopied] = useState(false);
+    const [shopProducts, setShopProducts] = useState<ProductDTO[]>([]);
+    const [shopProductsLoading, setShopProductsLoading] = useState(false);
 
     useEffect(() => {
         const fetchDetail = async () => {
@@ -29,6 +31,23 @@ export const PublicProductDetail = () => {
         };
         fetchDetail();
     }, [id]);
+
+    // Once we have the product, fetch other products from the same shop
+    useEffect(() => {
+        if (!product?.shopId || !id) return;
+        const fetchShopProducts = async () => {
+            setShopProductsLoading(true);
+            try {
+                const data = await productService.getShopProducts(product.shopId, id);
+                setShopProducts(data);
+            } catch {
+                // silently fail — section just stays empty
+            } finally {
+                setShopProductsLoading(false);
+            }
+        };
+        fetchShopProducts();
+    }, [product?.shopId, id]);
 
     const handleShare = async () => {
         const url = window.location.href;
@@ -304,18 +323,55 @@ export const PublicProductDetail = () => {
                 </div>
             </main>
 
-            {/* Related Products */}
+            {/* More from this shop */}
             <div className="max-w-6xl mx-auto w-full px-4 md:px-6 py-10 border-t border-slate-200">
                 <div className="flex items-center justify-between mb-6">
                     <h3 className="text-lg font-bold text-slate-800">More from this shop</h3>
-                    <button className="text-emerald-600 font-semibold text-sm hover:text-emerald-700 transition-colors">View All</button>
+                    <button
+                        onClick={() => navigate(`/?search=${product.shop.name}`)}
+                        className="text-emerald-600 font-semibold text-sm hover:text-emerald-700 transition-colors"
+                    >
+                        View All
+                    </button>
                 </div>
-                <div className="flex items-center justify-center py-12 bg-white rounded-xl border border-dashed border-slate-200">
-                    <div className="flex flex-col items-center gap-3 text-slate-400">
-                        <Package size={32} strokeWidth={1.5} />
-                        <p className="font-medium text-sm">More products coming soon</p>
+
+                {shopProductsLoading ? (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                        {[...Array(4)].map((_, i) => (
+                            <div key={i} className="bg-white rounded-xl h-48 animate-pulse border border-slate-100" />
+                        ))}
                     </div>
-                </div>
+                ) : shopProducts.length > 0 ? (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                        {shopProducts.map(p => (
+                            <button
+                                key={p.id}
+                                onClick={() => navigate(`/product/${p.id}`)}
+                                className="text-left bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-md hover:border-emerald-300 transition-all active:scale-[0.98] group"
+                            >
+                                <div className="aspect-square bg-slate-50 flex items-center justify-center overflow-hidden">
+                                    {p.imageUrl ? (
+                                        <img src={p.imageUrl} alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                                    ) : (
+                                        <Package size={32} className="text-slate-300" strokeWidth={1.5} />
+                                    )}
+                                </div>
+                                <div className="p-3">
+                                    <p className="text-xs text-slate-400 font-medium truncate">{p.category || 'Product'}</p>
+                                    <p className="text-sm font-bold text-slate-800 truncate mt-0.5">{p.name}</p>
+                                    <p className="text-emerald-600 font-bold text-sm mt-1">Rs {Number(p.sellingPrice).toLocaleString()}</p>
+                                </div>
+                            </button>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="flex items-center justify-center py-12 bg-white rounded-xl border border-dashed border-slate-200">
+                        <div className="flex flex-col items-center gap-3 text-slate-400">
+                            <Package size={32} strokeWidth={1.5} />
+                            <p className="font-medium text-sm">No other products from this shop</p>
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* Footer */}

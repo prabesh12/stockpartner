@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getProducts, createProduct, updateProduct, deleteProduct, getPublicProducts, getPublicProductDetail, getPublicCategories } from '../controllers/product.controller';
+import { getProducts, createProduct, updateProduct, deleteProduct, getPublicProducts, getPublicProductDetail, getPublicCategories, getPublicShopProducts } from '../controllers/product.controller';
 import { authenticateToken } from '../middleware/auth.middleware';
 
 const router = Router();
@@ -7,6 +7,7 @@ const router = Router();
 // PUBLIC ROUTES - No authentication required
 router.get('/public', getPublicProducts);
 router.get('/public/categories', getPublicCategories);
+router.get('/public/shop/:shopId/products', getPublicShopProducts);
 router.get('/public/:id', getPublicProductDetail);
 
 // PROTECTED ROUTES - Authentication required

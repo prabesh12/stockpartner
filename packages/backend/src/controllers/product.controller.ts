@@ -248,6 +248,34 @@ export const getPublicProductDetail = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 };
+
+export const getPublicShopProducts = async (req: Request, res: Response) => {
+  try {
+    const { shopId } = req.params;
+    const { excludeId } = req.query;
+
+    const products = await prisma.product.findMany({
+      where: {
+        shopId,
+        ...(excludeId ? { NOT: { id: excludeId as string } } : {}),
+        currentStock: { gt: 0 },
+      },
+      include: {
+        shop: {
+          select: { name: true }
+        }
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 8,
+    });
+
+    res.json(products);
+  } catch (error) {
+    console.error('getPublicShopProducts error:', error);
+    res.status(500).json({ error: 'Failed to fetch shop products' });
+  }
+};
+
 export const getPublicCategories = async (req: Request, res: Response) => {
   try {
     const products = await prisma.product.findMany({

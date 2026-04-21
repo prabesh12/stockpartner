@@ -51,34 +51,34 @@ export const Dashboard = () => {
       </div>
 
       {/* Metric Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 flex items-center justify-between">
-          <div>
-            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Today's Sales</p>
-            <h3 className="text-2xl font-bold text-slate-800">{data.dailySalesCount}</h3>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+        <div className="bg-white p-3.5 md:p-5 rounded-2xl border border-slate-200 flex flex-col gap-2.5">
+          <p className="text-[10px] md:text-xs font-semibold text-slate-500 uppercase tracking-wide leading-tight">Today's Sales</p>
+          <div className="flex items-end justify-between gap-1">
+            <h3 className="text-2xl font-bold text-slate-800 leading-none">{data.dailySalesCount}</h3>
+            <div className="p-2 bg-emerald-50 text-emerald-600 rounded-xl shrink-0"><ShoppingBag size={16} /></div>
           </div>
-          <div className="p-3 bg-emerald-50 text-emerald-600 rounded-xl"><ShoppingBag size={22} /></div>
         </div>
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 flex items-center justify-between">
-          <div>
-            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Today's Revenue</p>
-            <h3 className="text-2xl font-bold text-slate-800">₹{data.dailyRevenue.toFixed(2)}</h3>
+        <div className="bg-white p-3.5 md:p-5 rounded-2xl border border-slate-200 flex flex-col gap-2.5">
+          <p className="text-[10px] md:text-xs font-semibold text-slate-500 uppercase tracking-wide leading-tight">Today's Revenue</p>
+          <div className="flex items-end justify-between gap-1">
+            <h3 className="text-lg md:text-2xl font-bold text-slate-800 leading-none">₹{data.dailyRevenue.toFixed(2)}</h3>
+            <div className="p-2 bg-teal-50 text-teal-600 rounded-xl shrink-0"><DollarSign size={16} /></div>
           </div>
-          <div className="p-3 bg-teal-50 text-teal-600 rounded-xl"><DollarSign size={22} /></div>
         </div>
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 flex items-center justify-between">
-          <div>
-            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Est. Profit</p>
-            <h3 className="text-2xl font-bold text-slate-800">₹{data.dailyProfit.toFixed(2)}</h3>
+        <div className="bg-white p-3.5 md:p-5 rounded-2xl border border-slate-200 flex flex-col gap-2.5">
+          <p className="text-[10px] md:text-xs font-semibold text-slate-500 uppercase tracking-wide leading-tight">Est. Profit</p>
+          <div className="flex items-end justify-between gap-1">
+            <h3 className="text-lg md:text-2xl font-bold text-slate-800 leading-none">₹{data.dailyProfit.toFixed(2)}</h3>
+            <div className="p-2 bg-violet-50 text-violet-600 rounded-xl shrink-0"><TrendingUp size={16} /></div>
           </div>
-          <div className="p-3 bg-violet-50 text-violet-600 rounded-xl"><TrendingUp size={22} /></div>
         </div>
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 flex items-center justify-between">
-          <div>
-            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">All-Time Revenue</p>
-            <h3 className="text-2xl font-bold text-slate-800">₹{data.totalRevenue.toFixed(2)}</h3>
+        <div className="bg-white p-3.5 md:p-5 rounded-2xl border border-slate-200 flex flex-col gap-2.5">
+          <p className="text-[10px] md:text-xs font-semibold text-slate-500 uppercase tracking-wide leading-tight">All-Time Revenue</p>
+          <div className="flex items-end justify-between gap-1">
+            <h3 className="text-lg md:text-2xl font-bold text-slate-800 leading-none">₹{data.totalRevenue.toFixed(2)}</h3>
+            <div className="p-2 bg-sky-50 text-sky-600 rounded-xl shrink-0"><DollarSign size={16} /></div>
           </div>
-          <div className="p-3 bg-sky-50 text-sky-600 rounded-xl"><DollarSign size={22} /></div>
         </div>
       </div>
 

@@ -4,7 +4,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getMe, logout } from '@/store/slices/authSlice';
 import { RootState, AppDispatch } from '@/store';
 import { syncOfflineSales } from '@/store/slices/posSlice';
-import { Home, ShoppingBag, Package, Users, LogOut } from 'lucide-react';
+import { Home, ShoppingBag, Package, Users, LogOut, Store } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Login } from '@/pages/Login';
 import { Register } from '@/pages/Register';
 import { Products } from '@/pages/Products';
@@ -41,6 +42,7 @@ function App() {
   }, [token, dispatch]);
 
   const handleLogout = () => dispatch(logout());
+  const navigate = useNavigate();
 
   const activeLink = "flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-white bg-emerald-600 font-semibold text-sm shadow-sm transition-all";
   const inactiveLink = "flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 hover:text-slate-900 font-medium text-sm transition-all";
@@ -83,7 +85,13 @@ function App() {
                   <Users size={16} />Customers & Credit
                 </NavLink>
               </nav>
-              <div className="p-3 border-t border-slate-100">
+              <div className="p-3 border-t border-slate-100 space-y-1">
+                <button
+                  onClick={() => navigate('/')}
+                  className="w-full flex items-center gap-2.5 px-4 py-2.5 text-slate-500 hover:bg-emerald-50 hover:text-emerald-700 rounded-xl font-medium text-sm transition-colors"
+                >
+                  <Store size={16} />Visit Marketplace
+                </button>
                 <button onClick={handleLogout} className="w-full flex items-center gap-2.5 px-4 py-2.5 bg-slate-100 text-slate-600 rounded-xl hover:bg-rose-50 hover:text-rose-600 font-medium text-sm transition-colors">
                   <LogOut size={16} />Sign Out
                 </button>
@@ -130,6 +138,13 @@ function App() {
               <NavLink to="/dashboard/customers" className={({ isActive }) => `flex flex-col items-center gap-0.5 ${isActive ? 'text-emerald-600' : 'text-slate-400'}`}>
                 {({ isActive }) => <><div className={isActive ? 'bg-emerald-50 p-1.5 rounded-lg' : 'p-1.5'}><Users size={20} /></div><span className="text-[10px] font-semibold">Customers</span></>}
               </NavLink>
+              <button
+                onClick={() => navigate('/')}
+                className="flex flex-col items-center gap-0.5 text-slate-400 hover:text-emerald-600 transition-colors"
+              >
+                <div className="p-1.5"><Store size={20} /></div>
+                <span className="text-[10px] font-semibold">Market</span>
+              </button>
             </nav>
           </div>
         } />

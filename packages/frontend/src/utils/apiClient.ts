@@ -30,7 +30,7 @@ export const apiClient = async (endpoint: string, options: FetchOptions = {}) =>
     // Note: If /auth/login returns a 401 (wrong password), we shouldn't force log them out
     // because they are already logged out trying to log in. So we ignore 401s on login endpoint.
     if (response.status === 401 && !endpoint.includes('/auth/login')) {
-      store.dispatch(logout()); // Kicks them back to /login safely
+      store.dispatch(logout()); // Clears auth state → ProtectedRoute redirects to marketplace
       throw new Error('Session expired. Please log in again.');
     }
 
