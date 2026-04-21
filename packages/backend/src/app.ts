@@ -1,6 +1,8 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 import express from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
 import authRoutes from './routes/auth.routes';
 import productRoutes from './routes/product.routes';
 import customerRoutes from './routes/customer.routes';
@@ -12,8 +14,6 @@ import { HealthStatus } from 'shared';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import { errorHandler } from './middleware/error.middleware';
-
-dotenv.config();
 
 const app = express();
 

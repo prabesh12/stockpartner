@@ -1,10 +1,10 @@
 import { Resend } from 'resend';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
-const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
+const getFrontendUrl = () => process.env.FRONTEND_URL || 'http://localhost:5173';
 
 export const sendVerificationEmail = async (email: string, token: string, shopName: string) => {
-  const verifyLink = `${FRONTEND_URL}/verify-email?token=${token}`;
+  const verifyLink = `${getFrontendUrl()}/verify-email?token=${token}`;
 
   await resend.emails.send({
     from: 'StockSathi <onboarding@resend.dev>', // Update this after domain verification
@@ -36,7 +36,7 @@ export const sendVerificationEmail = async (email: string, token: string, shopNa
 };
 
 export const sendPasswordResetEmail = async (email: string, token: string) => {
-  const resetLink = `${FRONTEND_URL}/reset-password?token=${token}`;
+  const resetLink = `${getFrontendUrl()}/reset-password?token=${token}`;
 
   await resend.emails.send({
     from: 'StockSathi <onboarding@resend.dev>',
