@@ -18,7 +18,7 @@ export const Register = () => {
   const [customCategory, setCustomCategory] = useState('');
 
   const toggleCategory = (cat: string) => {
-    setSelectedCategories(prev => 
+    setSelectedCategories(prev =>
       prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]
     );
   };
@@ -56,18 +56,18 @@ export const Register = () => {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 text-center border border-gray-100">
-           <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-              </svg>
-           </div>
-           <h2 className="text-2xl font-bold text-gray-900 mb-2">Check your email</h2>
-           <p className="text-gray-500 mb-8">
-             We've sent a verification link to your email address. Please click the link to activate your account.
-           </p>
-           <Link to="/login" className="inline-block w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl transition-all">
-              Go to Login
-           </Link>
+          <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Check your email</h2>
+          <p className="text-gray-500 mb-8">
+            We've sent a verification link to your email address. Please click the link to activate your account.
+          </p>
+          <Link to="/login" className="inline-block w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl transition-all">
+            Go to Login
+          </Link>
         </div>
       </div>
     );
@@ -121,14 +121,14 @@ export const Register = () => {
               />
               {errors.password && <span className="text-sm text-red-500">{errors.password.message}</span>}
             </div>
-            
+
             <div className="pt-4 border-t border-gray-100">
               <label className="block text-sm font-bold text-gray-800 mb-3">Shop Categories <span className="text-gray-400 font-normal text-xs">(Taxonomy)</span></label>
               <div className="grid grid-cols-2 gap-2 mb-4">
                 {GENERIC_CATEGORIES.map(cat => (
                   <label key={cat} className="flex items-center space-x-2 text-sm text-gray-700 cursor-pointer p-2 hover:bg-gray-50 rounded-lg">
-                    <input 
-                      type="checkbox" 
+                    <input
+                      type="checkbox"
                       className="rounded text-blue-600 focus:ring-blue-500 w-4 h-4"
                       checked={selectedCategories.includes(cat)}
                       onChange={() => toggleCategory(cat)}
@@ -138,8 +138,8 @@ export const Register = () => {
                 ))}
                 {selectedCategories.filter(c => !GENERIC_CATEGORIES.includes(c)).map(cat => (
                   <label key={cat} className="flex items-center space-x-2 text-sm text-blue-700 font-medium cursor-pointer p-2 bg-blue-50 hover:bg-blue-100 rounded-lg">
-                    <input 
-                      type="checkbox" 
+                    <input
+                      type="checkbox"
                       className="rounded text-blue-600 focus:ring-blue-500 w-4 h-4"
                       checked={true}
                       onChange={() => toggleCategory(cat)}
@@ -149,11 +149,11 @@ export const Register = () => {
                 ))}
               </div>
               <div className="flex gap-2">
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   value={customCategory}
                   onChange={(e) => setCustomCategory(e.target.value)}
-                  onKeyDown={(e) => { if(e.key === 'Enter') { e.preventDefault(); addCustomCategory(); } }}
+                  onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addCustomCategory(); } }}
                   placeholder="Type custom category..."
                   className="flex-1 appearance-none rounded-md px-3 py-2 border border-gray-300 text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                 />
@@ -175,11 +175,11 @@ export const Register = () => {
               {isLoading ? 'Registering...' : 'Complete Registration'}
             </button>
           </div>
-          
+
           <div className="text-sm text-center">
-             <Link to="/login" className="font-medium text-blue-600 hover:text-blue-500">
-               Already have an account? Sign in
-             </Link>
+            <Link to="/login" className="font-medium text-blue-600 hover:text-blue-500">
+              Already have an account? Sign in
+            </Link>
           </div>
         </form>
       </div>

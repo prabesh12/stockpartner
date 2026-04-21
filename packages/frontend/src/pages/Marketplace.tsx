@@ -3,6 +3,7 @@ import { Search, ShoppingBag, Phone, MapPin, Tag, ChevronRight, Menu, X } from '
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import productService from '@/services/product.service';
 import { ProductDTO } from 'shared';
+import { ProductCard } from '@/components/ProductCard';
 
 export const Marketplace = () => {
     const [products, setProducts] = useState<ProductDTO[]>([]);
@@ -10,9 +11,25 @@ export const Marketplace = () => {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [categories, setCategories] = useState<string[]>([]);
+    const [categoriesLoading, setCategoriesLoading] = useState(true);
 
     const currentCategory = searchParams.get('category');
     const searchTerm = searchParams.get('search');
+
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const data = await productService.getPublicCategories();
+                setCategories(data);
+            } catch (err) {
+                console.error('Failed to fetch categories:', err);
+            } finally {
+                setCategoriesLoading(false);
+            }
+        };
+        fetchCategories();
+    }, []);
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -32,7 +49,6 @@ export const Marketplace = () => {
         fetchProducts();
     }, [currentCategory, searchTerm]);
 
-    const categories = ['Electronics', 'Clothing', 'Grocery', 'Fashion', 'Home', 'Services'];
 
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
@@ -102,17 +118,25 @@ export const Marketplace = () => {
                         </div>
                         <div className="border-t pt-4">
                              <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-3">Categories</h3>
-                             <div className="flex flex-col gap-2">
-                                {categories.map(cat => (
-                                    <button 
-                                        key={cat}
-                                        onClick={() => { navigate(`/?category=${cat}`); setIsMenuOpen(false); }}
-                                        className="text-left py-2 font-medium text-gray-700 hover:text-orange-500"
-                                    >
-                                        {cat}
-                                    </button>
-                                ))}
-                             </div>
+                              <div className="flex flex-col gap-2">
+                                {categoriesLoading ? (
+                                    [...Array(5)].map((_, i) => (
+                                        <div key={i} className="h-6 w-3/4 bg-gray-100 animate-pulse rounded-md mt-1"></div>
+                                    ))
+                                ) : categories.length > 0 ? (
+                                    categories.map(cat => (
+                                        <button 
+                                            key={cat}
+                                            onClick={() => { navigate(`/?category=${cat}`); setIsMenuOpen(false); }}
+                                            className="text-left py-2 font-medium text-gray-700 hover:text-orange-500"
+                                        >
+                                            {cat}
+                                        </button>
+                                    ))
+                                ) : (
+                                    <span className="text-xs text-gray-400 italic">No categories found</span>
+                                )}
+                              </div>
                         </div>
                     </div>
                 </div>
@@ -127,15 +151,21 @@ export const Marketplace = () => {
                     >
                         All Categories <ChevronRight size={14} className="opacity-50" />
                     </button>
-                    {categories.map(cat => (
-                        <button
-                            key={cat}
-                            onClick={() => navigate(`/?category=${cat}`)}
-                            className={`text-sm font-bold tracking-tight whitespace-nowrap transition-colors ${currentCategory === cat ? 'text-orange-500' : 'text-gray-400 hover:text-gray-900'}`}
-                        >
-                            {cat}
-                        </button>
-                    ))}
+                    {categoriesLoading ? (
+                        [...Array(6)].map((_, i) => (
+                            <div key={i} className="h-4 w-20 bg-gray-100 animate-pulse rounded-full"></div>
+                        ))
+                    ) : (
+                        categories.map(cat => (
+                            <button
+                                key={cat}
+                                onClick={() => navigate(`/?category=${cat}`)}
+                                className={`text-sm font-bold tracking-tight whitespace-nowrap transition-colors ${currentCategory === cat ? 'text-orange-500' : 'text-gray-400 hover:text-gray-900'}`}
+                            >
+                                {cat}
+                            </button>
+                        ))
+                    )}
                 </div>
             </div>
 
@@ -169,64 +199,33 @@ export const Marketplace = () => {
                 </div>
 
                 {loading ? (
-                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
-                        {[...Array(10)].map((_, i) => (
-                            <div key={i} className="bg-white rounded-2xl h-64 md:h-80 animate-pulse border border-gray-100 shadow-sm overflow-hidden">
-                                <div className="h-2/3 bg-gray-100"></div>
-                                <div className="p-4 space-y-2">
-                                     <div className="h-4 bg-gray-100 w-3/4 rounded-full"></div>
-                                     <div className="h-4 bg-gray-100 w-1/2 rounded-full"></div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 md:gap-12">
+                        {[...Array(8)].map((_, i) => (
+                            <div key={i} className="bg-white rounded-[2.5rem] h-[550px] animate-pulse border border-gray-100 shadow-sm overflow-hidden">
+                                <div className="h-3/5 bg-gray-50"></div>
+                                <div className="p-8 space-y-4">
+                                     <div className="h-6 bg-gray-50 w-3/4 rounded-full"></div>
+                                     <div className="h-6 bg-gray-50 w-1/2 rounded-full"></div>
                                 </div>
                             </div>
                         ))}
                     </div>
                 ) : products.length > 0 ? (
-                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 md:gap-12">
                         {products.map((product) => (
-                            <div 
+                            <ProductCard
                                 key={product.id}
+                                id={product.id}
+                                image={product.imageUrl || ''}
+                                category={product.category || 'Product'}
+                                name={product.name}
+                                price={Number(product.sellingPrice)}
+                                originalPrice={Number(product.sellingPrice) * 1.3} // Mock discount for design
+                                store={(product as any).shop?.name || 'Local Store'}
+                                quantity={product.unitType}
+                                badge="New Arrival"
                                 onClick={() => navigate(`/product/${product.id}`)}
-                                className="group bg-white rounded-2xl md:rounded-3xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer overflow-hidden border border-gray-100"
-                            >
-                                <div className="relative h-44 md:h-56 bg-gray-100 overflow-hidden">
-                                    {product.imageUrl ? (
-                                        <img 
-                                            src={product.imageUrl} 
-                                            alt={product.name}
-                                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
-                                        />
-                                    ) : (
-                                        <div className="w-full h-full flex flex-col items-center justify-center text-gray-300 gap-2">
-                                            <ShoppingBag size={40} className="opacity-20" />
-                                            <span className="text-xs font-bold tracking-widest uppercase opacity-30">No Image</span>
-                                        </div>
-                                    )}
-                                    {/* Discount / Tag Overlay */}
-                                    <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider text-gray-900 shadow-sm">
-                                        New Arrival
-                                    </div>
-                                </div>
-                                <div className="p-3 md:p-5 flex flex-col gap-1 md:gap-2">
-                                    <span className="text-[10px] md:text-xs font-bold text-orange-500 uppercase tracking-widest bg-orange-50 self-start px-2 py-0.5 rounded-md">
-                                        {product.category || 'Product'}
-                                    </span>
-                                    <h4 className="text-sm md:text-lg font-black text-gray-900 line-clamp-1 group-hover:text-orange-500 transition-colors tracking-tight">
-                                        {product.name}
-                                    </h4>
-                                    <div className="flex items-baseline gap-1 md:gap-2 mt-1 md:mt-2">
-                                        <span className="text-lg md:text-2xl font-black text-gray-900 tracking-tighter">
-                                            Rs {Number(product.sellingPrice).toLocaleString()}
-                                        </span>
-                                        <span className="text-[10px] font-bold text-gray-400">/{product.unitType}</span>
-                                    </div>
-                                    <div className="flex items-center gap-1 mt-1 md:mt-2 border-t pt-2 md:pt-3">
-                                        <div className="w-5 h-5 rounded-full bg-gray-100 flex items-center justify-center text-[8px] font-black text-gray-400">
-                                            {(product as any).shop?.name?.charAt(0) || 'S'}
-                                        </div>
-                                        <span className="text-[10px] md:text-xs font-bold text-gray-500 truncate">{(product as any).shop?.name}</span>
-                                    </div>
-                                </div>
-                            </div>
+                            />
                         ))}
                     </div>
                 ) : (

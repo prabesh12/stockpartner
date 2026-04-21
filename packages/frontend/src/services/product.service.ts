@@ -68,6 +68,12 @@ const productService = {
     const res = await fetch(`${API_BASE_URL}/products/public/${id}`);
     if (!res.ok) throw new Error('Failed to fetch product details');
     return res.json();
+  },
+
+  async getPublicCategories(): Promise<string[]> {
+    const res = await fetch(`${API_BASE_URL}/products/public/categories`);
+    if (!res.ok) throw new Error('Failed to fetch categories');
+    return res.json();
   }
 };
 

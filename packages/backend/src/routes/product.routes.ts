@@ -1,11 +1,12 @@
 import { Router } from 'express';
-import { getProducts, createProduct, updateProduct, deleteProduct, getPublicProducts, getPublicProductDetail } from '../controllers/product.controller';
+import { getProducts, createProduct, updateProduct, deleteProduct, getPublicProducts, getPublicProductDetail, getPublicCategories } from '../controllers/product.controller';
 import { authenticateToken } from '../middleware/auth.middleware';
 
 const router = Router();
 
 // PUBLIC ROUTES - No authentication required
 router.get('/public', getPublicProducts);
+router.get('/public/categories', getPublicCategories);
 router.get('/public/:id', getPublicProductDetail);
 
 // PROTECTED ROUTES - Authentication required

@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { prisma } from '../config/prisma';
-import { CreateProductRequest, UpdateProductRequest } from 'shared';
+import { CreateProductRequest, UpdateProductRequest, ProductDTO } from 'shared';
 
 export const getProducts = async (req: Request, res: Response) => {
   try {
@@ -243,5 +243,37 @@ export const getPublicProductDetail = async (req: Request, res: Response) => {
   } catch (error) {
     console.error('getPublicProductDetail error:', error);
     res.status(500).json({ error: 'Internal server error' });
+  }
+};
+export const getPublicCategories = async (req: Request, res: Response) => {
+  try {
+    const products = await prisma.product.findMany({
+      where: {
+        shop: {
+          users: {
+            some: {
+              isVerified: true,
+              role: 'OWNER'
+            }
+          }
+        },
+        category: {
+          not: null
+        }
+      },
+      select: {
+        category: true
+      },
+      distinct: ['category']
+    });
+
+    const categories = products
+      .map(p => p.category)
+      .filter((cat): cat is string => !!cat && cat.trim() !== '');
+
+    res.json(Array.from(new Set(categories)).sort());
+  } catch (error) {
+    console.error('getPublicCategories error:', error);
+    res.status(500).json({ error: 'Failed to fetch categories' });
   }
 };
