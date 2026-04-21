@@ -1,7 +1,14 @@
 import { Resend } from 'resend';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
-const getFrontendUrl = () => process.env.FRONTEND_URL || 'http://localhost:5173';
+const getFrontendUrl = () => {
+  const url = process.env.FRONTEND_URL;
+  // Guard against '*' values which are sometimes used for CORS but invalid for links
+  if (!url || url === '*') {
+    return 'http://localhost:5173';
+  }
+  return url;
+};
 
 export const sendVerificationEmail = async (email: string, token: string, shopName: string) => {
   const verifyLink = `${getFrontendUrl()}/verify-email?token=${token}`;
