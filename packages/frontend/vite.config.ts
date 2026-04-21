@@ -8,6 +8,8 @@ import path from 'path'
 export default defineConfig({
   plugins: [
     react(), 
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore - Vite internal type mismatch due to workspace hoisting; safe to ignore
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',

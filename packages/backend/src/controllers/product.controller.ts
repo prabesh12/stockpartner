@@ -47,6 +47,7 @@ export const createProduct = async (req: Request, res: Response) => {
           costPrice: data.costPrice as number,
           sellingPrice: data.sellingPrice as number,
           currentStock: initialStock,
+          lowStockThreshold: data.lowStockThreshold !== undefined ? data.lowStockThreshold : 5.0,
           description: data.description?.trim() || null,
           imageUrl: data.imageUrl?.trim() || null,
         }
@@ -115,6 +116,7 @@ export const updateProduct = async (req: Request, res: Response) => {
              sellingPrice: data.sellingPrice !== undefined ? data.sellingPrice : existingProduct.sellingPrice,
              description: data.description !== undefined ? data.description : existingProduct.description,
              imageUrl: data.imageUrl !== undefined ? data.imageUrl : existingProduct.imageUrl,
+             lowStockThreshold: data.lowStockThreshold !== undefined ? data.lowStockThreshold : (existingProduct as any).lowStockThreshold,
              currentStock: { increment: delta }
            }
          });
@@ -145,6 +147,7 @@ export const updateProduct = async (req: Request, res: Response) => {
              sellingPrice: data.sellingPrice !== undefined ? data.sellingPrice : existingProduct.sellingPrice,
              description: data.description !== undefined ? data.description : existingProduct.description,
              imageUrl: data.imageUrl !== undefined ? data.imageUrl : existingProduct.imageUrl,
+             lowStockThreshold: data.lowStockThreshold !== undefined ? data.lowStockThreshold : (existingProduct as any).lowStockThreshold,
            }
          });
       }

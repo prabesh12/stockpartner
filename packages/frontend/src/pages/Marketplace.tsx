@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Search, ShoppingBag, Phone, MapPin, Tag, ChevronRight, Menu, X } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Search, ShoppingBag, ChevronRight, Menu, X } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import productService from '@/services/product.service';
 import { ProductDTO } from 'shared';

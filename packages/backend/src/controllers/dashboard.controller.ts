@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { prisma } from '../config/prisma';
-import { DashboardSummaryDTO } from 'shared';
+import { DashboardSummaryDTO, ProductDTO } from 'shared';
 
 export const getSummary = async (req: Request, res: Response) => {
   try {
@@ -42,9 +42,9 @@ export const getSummary = async (req: Request, res: Response) => {
     const dailyProfit = dailyRevenue - dailyCost;
 
     const allProducts = await prisma.product.findMany({ where: { shopId } });
-    const lowStockProductsRaw = allProducts.filter(p => Number(p.currentStock) <= Number(p.lowStockThreshold || 5));
+    const lowStockProductsRaw = allProducts.filter(p => Number(p.currentStock) <= Number((p as any).lowStockThreshold || 5));
 
-    const mappedLowStock = lowStockProductsRaw.map(p => ({
+    const mappedLowStock: ProductDTO[] = lowStockProductsRaw.map(p => ({
         id: p.id,
         shopId: p.shopId,
         name: p.name,
@@ -55,7 +55,9 @@ export const getSummary = async (req: Request, res: Response) => {
         costPrice: Number(p.costPrice),
         sellingPrice: Number(p.sellingPrice),
         currentStock: Number(p.currentStock),
-        lowStockThreshold: Number(p.lowStockThreshold),
+        lowStockThreshold: Number((p as any).lowStockThreshold || 5),
+        description: p.description,
+        imageUrl: p.imageUrl,
         createdAt: p.createdAt.toISOString(),
         updatedAt: p.updatedAt.toISOString(),
     }));

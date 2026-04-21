@@ -107,6 +107,7 @@ model Product {
   sellingPrice      Decimal  @map("selling_price") @db.Decimal(12, 2)
   unitType          String   @default("PCs") @map("unit_type") @db.VarChar(50)
   currentStock      Decimal  @default(0.000) @map("current_stock") @db.Decimal(10, 3)
+  lowStockThreshold Decimal  @default(5.000) @map("low_stock_threshold") @db.Decimal(10, 3)
   description       String?  @db.Text
   imageUrl          String?  @map("image_url") @db.Text
   createdAt         DateTime @default(now()) @map("created_at")

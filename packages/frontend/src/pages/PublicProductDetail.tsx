@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ShoppingBag, ArrowLeft, Phone, MapPin, Tag, Share2, ShieldCheck, Truck, RefreshCcw } from 'lucide-react';
+import { ShoppingBag, ArrowLeft, Phone, MapPin, Share2, ShieldCheck, Truck } from 'lucide-react';
 import productService from '@/services/product.service';
 import { ProductDTO } from 'shared';
 

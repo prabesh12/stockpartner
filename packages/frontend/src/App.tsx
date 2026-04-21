@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
-import React from 'react';
-import { Routes, Route, Navigate, NavLink } from 'react-router-dom';
+import { Routes, Route, NavLink } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { getMe, logout } from '@/store/slices/authSlice';
 import { RootState, AppDispatch } from '@/store';
@@ -129,10 +128,10 @@ function App() {
         
         {/* Isolated Super Admin Portal */}
         {user && user.role === 'PLATFORM_ADMIN' && (
-           <React.Fragment>
+           <>
              <Route path="/superadmin" element={<SuperAdminDashboard />} />
              <Route path="/superadmin/workspace/:id" element={<WorkspaceDetail />} />
-           </React.Fragment>
+           </>
         )}
       </Route>
 

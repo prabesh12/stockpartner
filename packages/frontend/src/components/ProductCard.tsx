@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { ShoppingCart, Star, Heart, Image as ImageIcon } from 'lucide-react';
 
 interface ProductCardProps {
@@ -17,7 +17,7 @@ interface ProductCardProps {
 }
 
 export function ProductCard({
-  id,
+  id: _id,
   image,
   badge,
   category,
