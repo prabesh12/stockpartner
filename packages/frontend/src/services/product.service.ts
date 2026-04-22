@@ -49,7 +49,10 @@ const productService = {
       method: 'DELETE',
       headers: getAuthHeaders(),
     });
-    if (!res.ok) throw new Error('Failed to delete product');
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Failed to delete product');
+    }
   },
 
   async getPublicProducts(category?: string, search?: string): Promise<ProductDTO[]> {

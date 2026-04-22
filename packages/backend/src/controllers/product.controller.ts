@@ -177,8 +177,21 @@ export const deleteProduct = async (req: Request, res: Response) => {
     });
 
     res.status(204).send();
-  } catch (error) {
+  } catch (error: any) {
     console.error('deleteProduct error:', error);
+    
+    // P2003: Foreign key constraint failed (e.g. product has sales)
+    if (error.code === 'P2003') {
+      return res.status(400).json({ 
+        error: 'Cannot delete product because it has associated sales records. Consider renaming it instead.' 
+      });
+    }
+
+    // P2025: Record to delete does not exist
+    if (error.code === 'P2025') {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+
     res.status(500).json({ error: 'Failed to delete product' });
   }
 };
