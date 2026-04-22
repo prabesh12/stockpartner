@@ -45,7 +45,7 @@ export const Login = () => {
         <span className="text-xl font-bold text-slate-800">Stock<span className="text-emerald-600">Sathi</span></span>
       </div>
 
-      <div className="max-w-md w-full bg-white px-6 py-8 rounded-2xl shadow-sm border border-slate-200">
+      <div className="max-w-md w-full bg-white px-4 sm:px-6 py-8 rounded-2xl shadow-sm border border-slate-200">
         <div className="mb-6">
           <h2 className="text-2xl font-bold text-slate-800">Welcome back</h2>
           <p className="text-slate-500 text-sm mt-1">Sign in to your shop dashboard</p>

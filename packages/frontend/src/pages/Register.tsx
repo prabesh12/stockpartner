@@ -133,7 +133,7 @@ export const Register = () => {
         <span className="text-xl font-bold text-slate-800">Stock<span className="text-emerald-600">Sathi</span></span>
       </div>
 
-      <div className="max-w-md w-full bg-white px-6 py-8 rounded-2xl border border-slate-200 shadow-sm">
+      <div className="max-w-md w-full bg-white px-4 sm:px-6 py-8 rounded-2xl border border-slate-200 shadow-sm">
         <div className="mb-6">
           <h2 className="text-2xl font-bold text-slate-800">Register Your Shop</h2>
           <p className="text-slate-500 text-sm mt-1">Set up your store and start managing inventory in minutes.</p>
@@ -294,7 +294,7 @@ export const Register = () => {
               <p className="text-xs text-slate-400 mt-0.5">Select the product types you sell</p>
             </div>
 
-            <div className="grid grid-cols-2 gap-2 mb-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-3">
               {GENERIC_CATEGORIES.map(cat => {
                 const isSelected = selectedCategories.includes(cat);
                 return (
@@ -341,7 +341,7 @@ export const Register = () => {
             )}
 
             {/* Custom category input */}
-            <div className="flex gap-2">
+            <div className="flex flex-col sm:flex-row gap-2">
               <input
                 type="text"
                 value={customCategory}
@@ -353,7 +353,7 @@ export const Register = () => {
               <button
                 type="button"
                 onClick={addCustomCategory}
-                className="px-4 py-2.5 bg-emerald-600 text-white text-sm font-semibold rounded-xl hover:bg-emerald-700 transition-colors flex items-center gap-1.5"
+                className="px-4 py-2.5 bg-emerald-600 text-white text-sm font-semibold rounded-xl hover:bg-emerald-700 transition-colors flex items-center justify-center gap-1.5"
               >
                 <Plus size={16} />Add
               </button>
