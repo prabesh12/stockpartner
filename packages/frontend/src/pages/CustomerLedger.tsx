@@ -15,7 +15,6 @@ import {
   Banknote,
   Smartphone,
   ChevronRight,
-  Landmark,
   ArrowUpRight,
   ArrowDownLeft
 } from 'lucide-react';
