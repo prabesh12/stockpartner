@@ -77,7 +77,7 @@ export const Products = () => {
       {error && <div className="p-4 bg-rose-50 text-rose-600 rounded-xl border border-rose-100 text-sm font-medium">{error}</div>}
 
       {/* Table */}
-      <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+      <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
         {isLoading && items.length === 0 ? (
           <div className="p-12 text-center">
             <div className="w-8 h-8 border-[3px] border-emerald-600 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
@@ -119,7 +119,7 @@ export const Products = () => {
                       </span>
                     </td>
                     <td className="px-5 py-4 text-right">
-                      <span className={`text-sm font-bold ${Number(product.currentStock) <= (product.lowStockThreshold || 5) ? 'text-rose-600' : 'text-emerald-600'}`}>
+                      <span className={`text-sm font-semibold ${Number(product.currentStock) <= (product.lowStockThreshold || 5) ? 'text-rose-600' : 'text-emerald-600'}`}>
                         {Number(product.currentStock).toFixed(2)}
                       </span>
                     </td>

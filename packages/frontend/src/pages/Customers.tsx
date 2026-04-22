@@ -94,7 +94,7 @@ export const Customers = () => {
       {error && <div className="p-4 bg-rose-50 text-rose-600 rounded-xl border border-rose-100 text-sm font-medium">{error}</div>}
 
       {/* Table */}
-      <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+      <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
         {isLoading && items.length === 0 ? (
           <div className="p-12 text-center">
             <div className="w-8 h-8 border-[3px] border-emerald-600 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
@@ -115,16 +115,16 @@ export const Customers = () => {
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
-                <tr className="bg-slate-50 border-b border-slate-100">
-                  <th className="px-5 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">Customer</th>
-                  <th className="px-5 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">Contact</th>
-                  <th className="px-5 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider text-right">Credit Balance</th>
-                  <th className="px-5 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider text-right">Actions</th>
+                <tr className="bg-slate-50 border-b border-emerald-100">
+                  <th className="px-5 py-3.5 text-xs font-semibold text-emerald-800 uppercase tracking-wider">Customer</th>
+                  <th className="px-5 py-3.5 text-xs font-semibold text-emerald-800 uppercase tracking-wider">Contact</th>
+                  <th className="px-5 py-3.5 text-xs font-semibold text-emerald-800 uppercase tracking-wider text-right">Credit Balance</th>
+                  <th className="px-5 py-3.5 text-xs font-semibold text-emerald-800 uppercase tracking-wider text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
                 {items.map((customer) => (
-                  <tr key={customer.id} className="hover:bg-slate-50/60 transition-colors">
+                  <tr key={customer.id} className="hover:bg-slate-50 transition-colors even:bg-slate-50/50">
                     <td className="px-5 py-4">
                       <div className="font-semibold text-slate-800 text-sm">{customer.name}</div>
                       <div className="text-xs text-slate-400 mt-0.5 truncate max-w-[200px]">{customer.address || 'No address'}</div>
@@ -133,25 +133,25 @@ export const Customers = () => {
                       <div className="text-slate-600 text-sm font-medium">{customer.phone}</div>
                     </td>
                     <td className="px-5 py-4 text-right">
-                      <span className={`text-sm font-bold ${Number(customer.totalDue) > 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
+                      <span className={`text-sm font-semibold ${Number(customer.totalDue) > 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
                         ₹{Number(customer.totalDue).toFixed(2)}
                       </span>
                     </td>
                     <td className="px-5 py-4 text-right">
-                      <div className="flex items-center justify-end gap-1.5 flex-wrap">
+                      <div className="flex items-center justify-end gap-2 flex-wrap">
                         {Number(customer.totalDue) > 0 && (
                           <button
                             onClick={() => handleOpenPaymentModal(customer)}
-                            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg transition-colors border border-emerald-200"
+                            className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg transition-colors border border-emerald-200"
                           >
-                            <Wallet size={13} />Receive Pay
+                            <Wallet size={12} />Receive Pay
                           </button>
                         )}
                         <button
                           onClick={() => navigate(`/dashboard/customers/${customer.id}/ledger`)}
-                          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors"
+                          className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors"
                         >
-                          <FileText size={13} />Ledger
+                          <FileText size={12} />Ledger
                         </button>
                         <button onClick={() => handleOpenCustomerModal(customer)} className="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors">
                           <Edit2 size={15} />

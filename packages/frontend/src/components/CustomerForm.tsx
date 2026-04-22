@@ -32,21 +32,39 @@ export const CustomerForm = ({ initialData, onSubmit, onClose, isLoading }: Cust
           </button>
         </div>
 
-        <div className="overflow-y-auto px-6 py-5">
-          <form id="customer-form" onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <div className="overflow-y-auto px-6 py-6">
+          <form id="customer-form" onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             <div>
               <label className={labelClass}>Full Name *</label>
               <input {...register("name", { required: "Name is required" })} className={inputClass} placeholder="Ram Kumar" />
               {errors.name && <p className="text-rose-500 text-xs mt-1">{errors.name.message as string}</p>}
             </div>
             <div>
+              <label className={labelClass}>Email Address</label>
+              <input {...register("email")} type="email" className={inputClass} placeholder="abc.traders@gmail.com" />
+              {errors.email && <p className="text-rose-500 text-xs mt-1">{errors.email.message as string}</p>}
+            </div>
+            <div>
               <label className={labelClass}>Phone Number *</label>
               <input {...register("phone", { required: "Phone is required" })} className={inputClass} placeholder="98..." />
               {errors.phone && <p className="text-rose-500 text-xs mt-1">{errors.phone.message as string}</p>}
             </div>
+            {!initialData && (
+              <div>
+                <label className={labelClass}>Opening Balance (₹)</label>
+                <input 
+                  {...register("openingBalance")} 
+                  type="number" 
+                  step="0.01" 
+                  className={inputClass} 
+                  placeholder="0.00" 
+                />
+                <p className="text-[10px] text-slate-400 mt-1">Initial credit/debit balance for this customer.</p>
+              </div>
+            )}
             <div>
               <label className={labelClass}>Address</label>
-              <textarea {...register("address")} className={inputClass} placeholder="Area, City" rows={3} />
+              <textarea {...register("address")} className={inputClass} placeholder="Area, City" rows={2} />
             </div>
           </form>
         </div>

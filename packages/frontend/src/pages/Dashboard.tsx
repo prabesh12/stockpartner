@@ -85,7 +85,7 @@ export const Dashboard = () => {
       {/* Tables */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Top Selling */}
-        <div className="bg-white rounded-2xl border border-slate-200 flex flex-col overflow-hidden">
+        <div className="bg-white rounded-lg border border-slate-200 flex flex-col overflow-hidden">
           <div className="p-5 border-b border-slate-100 flex items-center gap-2">
             <TrendingUp size={18} className="text-emerald-600" />
             <h3 className="font-bold text-slate-800 text-sm">Top Selling Products</h3>
@@ -117,7 +117,7 @@ export const Dashboard = () => {
         </div>
 
         {/* Low Stock Alerts */}
-        <div className="bg-white rounded-2xl border border-slate-200 flex flex-col overflow-hidden">
+        <div className="bg-white border border-slate-200 flex flex-col overflow-hidden">
           <div className="p-5 border-b border-slate-100 flex items-center gap-2">
             <AlertTriangle size={18} className="text-amber-500" />
             <h3 className="font-bold text-slate-800 text-sm">Low Stock Alerts</h3>

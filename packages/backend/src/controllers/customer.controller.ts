@@ -19,23 +19,67 @@ export const getCustomers = async (req: Request, res: Response) => {
   }
 };
 
+export const getCustomerById = async (req: Request, res: Response) => {
+  try {
+    const shopId = req.user?.shopId;
+    const { id } = req.params;
+    if (!shopId) return res.status(401).json({ error: 'Unauthorized' });
+
+    const customer = await prisma.customer.findUnique({
+      where: { id, shopId },
+    });
+
+    if (!customer) return res.status(404).json({ error: 'Customer not found' });
+
+    res.json(customer);
+  } catch (error) {
+    console.error('getCustomerById error:', error);
+    res.status(500).json({ error: 'Failed to fetch customer' });
+  }
+};
+
 export const createCustomer = async (req: Request, res: Response) => {
   try {
     const shopId = req.user?.shopId;
-    if (!shopId) return res.status(401).json({ error: 'Unauthorized' });
+    const userId = req.user?.userId;
+    if (!shopId || !userId) return res.status(401).json({ error: 'Unauthorized' });
 
     const data = req.body as CreateCustomerRequest;
     if (!data.name || !data.phone) {
-      return res.status(400).json({ error: 'Missing requried fields' });
+      return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    const customer = await prisma.customer.create({
-      data: {
-        shopId,
-        name: data.name,
-        phone: data.phone,
-        address: data.address,
+    const openingBalance = data.openingBalance ? Number(data.openingBalance) : 0;
+
+    const customer = await prisma.$transaction(async (tx) => {
+      const newCustomer = await tx.customer.create({
+        data: {
+          shopId,
+          name: data.name,
+          phone: data.phone,
+          email: data.email || null,
+          address: data.address || null,
+          openingBalance: openingBalance,
+          totalDue: openingBalance,
+        }
+      });
+
+      if (openingBalance !== 0) {
+        await tx.customerLedger.create({
+          data: {
+            shopId,
+            customerId: newCustomer.id,
+            userId,
+            type: openingBalance > 0 ? 'CREDIT' : 'PAYMENT',
+            amount: Math.abs(openingBalance),
+            balanceAfter: openingBalance,
+            notes: 'Opening Balance',
+            voucherNo: 'OP-0001', // Example initial voucher
+          }
+        });
       }
+
+      return newCustomer;
     });
 
     res.status(201).json(customer);
@@ -61,6 +105,7 @@ export const updateCustomer = async (req: Request, res: Response) => {
       data: {
         name: data.name,
         phone: data.phone,
+        email: data.email,
         address: data.address,
       }
     });
@@ -79,7 +124,7 @@ export const recordPayment = async (req: Request, res: Response) => {
     const customerId = req.params.id;
     if (!shopId || !userId) return res.status(401).json({ error: 'Unauthorized' });
 
-    const { amount, notes } = req.body as RecordPaymentRequest;
+    const { amount, notes, paymentMethod } = req.body as RecordPaymentRequest;
 
     if (!amount || amount <= 0) {
       return res.status(400).json({ error: 'Valid amount required' });
@@ -100,6 +145,10 @@ export const recordPayment = async (req: Request, res: Response) => {
         }
       });
 
+      // Generate a simple voucher number for payments: RCT-[short-id or counter]
+      const count = await tx.customerLedger.count({ where: { shopId, type: 'PAYMENT' } });
+      const voucherNo = `RCT-${(count + 1).toString().padStart(4, '0')}`;
+
       // 2. Insert chronological ledger locking state securely
       const ledgerEntry = await tx.customerLedger.create({
         data: {
@@ -108,8 +157,10 @@ export const recordPayment = async (req: Request, res: Response) => {
           userId,
           type: 'PAYMENT',
           amount: amount,
+          paymentMethod: paymentMethod || 'CASH',
           balanceAfter: updatedCustomer.totalDue,
-          notes: notes || 'Cash received',
+          notes: notes || 'Payment Received',
+          voucherNo,
         }
       });
 

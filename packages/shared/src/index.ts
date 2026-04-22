@@ -89,7 +89,9 @@ export interface CustomerDTO {
   shopId: string;
   name: string;
   phone: string;
+  email: string | null;
   address: string | null;
+  openingBalance: number;
   totalDue: number;
   createdAt: string;
   updatedAt: string;
@@ -98,17 +100,22 @@ export interface CustomerDTO {
 export interface CustomerLedgerDTO {
   id: string;
   type: 'CREDIT' | 'PAYMENT';
+  voucherNo: string | null;
+  paymentMethod: string | null;
   amount: number;
   balanceAfter: number;
   referenceId: string | null;
   notes: string | null;
   createdAt: string;
+  user?: { name: string };
 }
 
 export interface CreateCustomerRequest {
   name: string;
   phone: string;
+  email?: string;
   address?: string;
+  openingBalance?: number;
 }
 
 export interface RecordPaymentRequest {

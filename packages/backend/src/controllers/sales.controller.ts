@@ -89,6 +89,10 @@ export const createSale = async (req: Request, res: Response) => {
           });
           const currentBalance = latestLedger ? Number(latestLedger.balanceAfter) : 0;
 
+          // Generate voucher number: INV-[counter]
+          const saleCount = await tx.sale.count({ where: { shopId } });
+          const voucherNo = `INV-${saleCount.toString().padStart(4, '0')}`;
+
           // Double Entry 1: Record full sale as CREDIT (debt created)
           const creditBalAfter = currentBalance + payload.finalAmount;
           await tx.customerLedger.create({
@@ -101,6 +105,7 @@ export const createSale = async (req: Request, res: Response) => {
               balanceAfter: creditBalAfter,
               referenceId: newSale.id,
               notes: isFullyPaid ? 'Sale Issued (Fully Paid)' : 'Sale Issued',
+              voucherNo,
             }
           });
 
@@ -117,7 +122,9 @@ export const createSale = async (req: Request, res: Response) => {
                 amount: payload.paidAmount,
                 balanceAfter: finalBalAfter,
                 referenceId: newSale.id,
-                notes: `${isFullyPaid ? 'Fully Paid' : 'Upfront Payment'} via ${payload.paymentMethod}`,
+                notes: `${isFullyPaid ? 'Fully Paid' : 'Upfront Payment'}`,
+                paymentMethod: payload.paymentMethod,
+                voucherNo,
               }
             });
           }

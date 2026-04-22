@@ -16,6 +16,12 @@ const customerService = {
     return res.json();
   },
 
+  async getCustomer(id: string): Promise<CustomerDTO> {
+    const res = await fetch(`${API_BASE_URL}/customers/${id}`, { headers: getAuthHeaders() });
+    if (!res.ok) throw new Error('Failed to fetch customer details');
+    return res.json();
+  },
+
   async createCustomer(data: CreateCustomerRequest): Promise<CustomerDTO> {
     const res = await fetch(`${API_BASE_URL}/customers`, {
       method: 'POST',

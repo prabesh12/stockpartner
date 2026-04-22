@@ -242,7 +242,7 @@ export const SuperAdminDashboard = () => {
           )}
 
           {/* Tenant Grid Configuration Panel */}
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mt-8">
+          <div className="bg-white rounded-lg border border-slate-200 overflow-hidden mt-8">
              <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-white text-slate-900 rounded-t-2xl relative">
                 <h3 className="font-bold text-xl flex items-center gap-2">
                    <Store size={22} className="text-slate-400" /> Active Workspaces
